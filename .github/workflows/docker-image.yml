@@ -14,10 +14,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 2.7.10
+    - name: Set up Python 2.7.18
       uses: actions/setup-python@v3
       with:
-        python-version: "2.7.10"
+        python-version: "2.7.18"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
