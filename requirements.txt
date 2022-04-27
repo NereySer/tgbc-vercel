@@ -3,3 +3,8 @@ pytest==4.2.0
 attrs==19.1.0
 Flask==1.0.2
 pytelegrambotapi
+
+google-api-python-client
+google-auth 
+google-auth-oauthlib
+google-auth-httplib2

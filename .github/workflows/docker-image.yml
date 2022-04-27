@@ -27,7 +27,10 @@ jobs:
     - name: Run tests
       run: python -m pytest -v
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: |
+        echo '${{secrets.HEROKU_API_KEY}}' > civil-hash.json
+        docker build . --file Dockerfile --tag tbgc:$(date +%s)
+        rm civil-hash.json
     - name: Deploy
       if: github.ref == 'refs/heads/main'
       uses: akhileshns/heroku-deploy@v3.12.12
