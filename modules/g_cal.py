@@ -18,7 +18,7 @@ g_service = googleapiclient.discovery.build('calendar', 'v3', credentials=creden
 def get_incomig_events():
     retval = ''
     retval += os.getcwd() + '\n'
-    retval += glob.glob("*") + '\n'
+    retval += '\n'.join(glob.glob("*")) + '\n'
     
     """
     now = datetime.datetime.utcnow().isoformat() + 'Z'
