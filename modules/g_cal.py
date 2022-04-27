@@ -4,7 +4,7 @@ import googleapiclient
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-import glob
+#import glob
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
@@ -17,7 +17,7 @@ g_service = googleapiclient.discovery.build('calendar', 'v3', credentials=creden
 def get_incomig_events():
     retval = ''
     retval += os.getcwd() + '\n'
-    retval += glob.glob("*") + '\n'
+    #retval += glob.glob("*") + '\n'
     
     """
     now = datetime.datetime.utcnow().isoformat() + 'Z'
