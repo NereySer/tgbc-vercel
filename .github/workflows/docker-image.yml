@@ -41,6 +41,7 @@ jobs:
       env:
         HD_TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         HD_TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_ID}}
+        HD_GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}
     - name: Clear hash
       if: always()
       run: rm civil-hash.json
