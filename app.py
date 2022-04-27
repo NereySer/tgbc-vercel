@@ -1,16 +1,22 @@
 import os
 import signal
+import telebot
 from flask import Flask
 from buzz import generator
 
+bot = telebot.TeleBot(os.getenv('TELEGRAM_BOT_TOKEN'))
 app = Flask(__name__)
 
 signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 
 @app.route("/")
 def generate_buzz():
+    buzz = generator.generate_buzz()
+    
+    bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), buzz)
+    
     page = '<html><body><h1>'
-    page += generator.generate_buzz()
+    page += buzz
     page += '</h1></body></html>'
     return page
 
