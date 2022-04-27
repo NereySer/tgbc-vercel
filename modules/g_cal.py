@@ -4,6 +4,8 @@ import googleapiclient
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
+import glob
+"""
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 calendarId = os.getenv('GOOGLE_CALENDAR_ID')
@@ -11,10 +13,16 @@ SERVICE_ACCOUNT_FILE = 'src/key/civil-hash.json'
 
 credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 g_service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
-
+"""
 def get_incomig_events():
     retval = ''
-
+    retval += '--------------\n'
+    retval += '\n'.join(glob.glob("*")) + '\n'
+    retval += '--------------\n'
+    retval += '\n'.join(glob.glob("src/*")) + '\n'
+    retval += '--------------\n'
+    retval += '\n'.join(glob.glob("src/key/*")) + '\n'
+    """
     now = datetime.datetime.utcnow().isoformat() + 'Z'
     retval += 'Getting the upcoming 10 events\n'
     events_result = g_service.events().list(calendarId=calendarId,
@@ -28,5 +36,5 @@ def get_incomig_events():
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
         retval += start + event['summary'] + '\n'
-    
+    """
     return retval
