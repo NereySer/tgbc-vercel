@@ -13,6 +13,8 @@ credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCO
 g_service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
 
 def get_incomig_events():
+    retval = ''
+    
     now = datetime.datetime.utcnow().isoformat() + 'Z'
     retval += 'Getting the upcoming 10 events\n'
     events_result = g_service.events().list(calendarId=calendarId,
