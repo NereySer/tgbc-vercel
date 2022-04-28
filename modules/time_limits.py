@@ -10,4 +10,4 @@ def getEnd():
 
     end_next_day = next_day.replace(hour=23, minute=59, second=59, microsecond=0)
 
-    return end_next_day.astimezone(timezone.utc).isoformat() + 'Z'
+    return end_next_day.astimezone(timezone.utc).replace(tzinfo=None).isoformat() + 'Z'
