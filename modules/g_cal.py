@@ -1,8 +1,10 @@
 import os
-import time_limits as t
+
 import googleapiclient
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+
+from modules import time_limits as t
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
