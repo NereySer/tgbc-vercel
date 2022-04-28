@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
 
@@ -31,16 +31,17 @@ jobs:
         echo '${{secrets.GOOGLE_KEY}}' > civil-hash.json
         docker build . --file Dockerfile --tag tbgc:$(date +%s)
     - name: Deploy
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' || 
+          github.ref == 'refs/heads/develop'
       uses: akhileshns/heroku-deploy@v3.12.12
       with:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-        heroku_app_name: "tbgc"
+        heroku_app_name: ${{ github.ref == 'refs/heads/main' && "tbgc" || "tbgc-dev" }}
         heroku_email: ${{secrets.HEROKU_EMAIL}}
         usedocker: true
       env:
         HD_TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
-        HD_TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_ID}}
+        HD_TELEGRAM_CHANNEL_ID: ${{ github.ref == 'refs/heads/main' && secrets.TELEGRAM_CHANNEL_ID || secrets.TELEGRAM_CHANNEL_DEV_ID }}
         HD_GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}
     - name: Clear hash
       if: always()
