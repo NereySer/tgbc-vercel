@@ -1,5 +1,5 @@
 import os
-import datetime
+import time_limits as t
 import googleapiclient
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -15,11 +15,10 @@ g_service = googleapiclient.discovery.build('calendar', 'v3', credentials=creden
 def get_incomig_events():
     retval = ''
     
-    now = datetime.datetime.utcnow().isoformat() + 'Z'
     retval += 'Getting the upcoming 10 events\n'
     events_result = g_service.events().list(calendarId=calendarId,
-                                            timeMin=now,
-                                            maxResults=10, singleEvents=True,
+                                            timeMin=t.getStart(), timeMax=t.getEnd()
+                                            singleEvents=True,
                                             orderBy='startTime').execute()
     events = events_result.get('items', [])
 
