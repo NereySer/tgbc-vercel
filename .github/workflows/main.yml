@@ -24,12 +24,18 @@ jobs:
         #pip install pytest
         #if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip3 install -r requirements.txt
-    - name: Run tests
-      run: python -m pytest -v
-    - name: Build the Docker image
+    - name: Create Google API key
       run: |
         mkdir key
         echo '${{secrets.GOOGLE_KEY}}' > key/civil-hash.json
+    - name: Run tests
+      run: python -m pytest -v
+      env: 
+        TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
+        TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_DEV_ID}}
+        GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
+    - name: Build the Docker image
+      run: |
         docker build . --file Dockerfile --tag tbgc:$(date +%s)
     - name: Deploy
       if: github.ref == 'refs/heads/main' || 
