@@ -28,7 +28,8 @@ jobs:
       run: python -m pytest -v
     - name: Build the Docker image
       run: |
-        echo '${{secrets.GOOGLE_KEY}}' > civil-hash.json
+        mkdir key
+        echo '${{secrets.GOOGLE_KEY}}' > key/civil-hash.json
         docker build . --file Dockerfile --tag tbgc:$(date +%s)
     - name: Deploy
       if: github.ref == 'refs/heads/main' || 
@@ -45,4 +46,4 @@ jobs:
         HD_GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}
     - name: Clear hash
       if: always()
-      run: rm civil-hash.json
+      run: rm key/civil-hash.json || true

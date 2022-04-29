@@ -9,7 +9,7 @@ from modules import time_limits as t
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 calendarId = os.getenv('GOOGLE_CALENDAR_ID')
-SERVICE_ACCOUNT_FILE = 'src/key/civil-hash.json'
+SERVICE_ACCOUNT_FILE = 'key/civil-hash.json'
 
 credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 g_service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
