@@ -32,7 +32,7 @@ jobs:
       run: python -m pytest -v
       env: 
         TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
-        TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_DEV_ID}}
+        TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
     - name: Build the Docker image
       run: |
