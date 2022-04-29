@@ -12,6 +12,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      DOCKER_IMAGE_TAG: "{{ $env.GITHUB_REPOSITORY }}:{{ $env.GITHUB_RUN_ID }}"
+      DOCKER_CONTAINER_NAME: "{{ $env.GITHUB_REPOSITORY }}_{{ $env.GITHUB_RUN_ID }}"
+    
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.7
@@ -34,9 +38,15 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
-    - name: Build the Docker image
+    - name: Build the Docker image and test run
       run: |
-        docker build . --file Dockerfile --tag tbgc:$(date +%s)
+        docker build . --file Dockerfile --tag $DOCKER_IMAGE_TAG
+        docker start -d --rm --name $DOCKER_CONTAINER_NAME --env PORT=5000 $DOCKER_IMAGE_TAG
+        docker exec $DOCKER_CONTAINER_NAME curl http://localhost:5000/
+      env: 
+        TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
+        TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
+        GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
     - name: Deploy
       if: github.ref == 'refs/heads/main' || 
           github.ref == 'refs/heads/develop'
