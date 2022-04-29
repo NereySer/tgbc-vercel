@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKER_IMAGE_TAG: "{{ $env.GITHUB_REPOSITORY }}:{{ $env.GITHUB_RUN_ID }}"
-      DOCKER_CONTAINER_NAME: "{{ $env.GITHUB_REPOSITORY }}_{{ $env.GITHUB_RUN_ID }}"
+      DOCKER_IMAGE_TAG: '{{ github.repository }}:{{ github.run_id }}'
+      DOCKER_CONTAINER_NAME: '{{ github.repository }}_{{ github.run_id }}'
     
     steps:
     - uses: actions/checkout@v3
