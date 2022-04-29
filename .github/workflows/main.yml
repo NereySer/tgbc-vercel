@@ -49,7 +49,7 @@ jobs:
         docker build . \
               --file Dockerfile \
               --tag ${DOCKER_IMAGE_TAG,,}
-    - name: Run the Docker image
+    - name: Run and prepare the Docker image
       run: |
         docker run \
               -d --rm \
@@ -58,24 +58,24 @@ jobs:
               --env TELEGRAM_CHANNEL_ID=$TELEGRAM_CHANNEL_ID \
               --env GOOGLE_CALENDAR_ID=$GOOGLE_CALENDAR_ID \
               ${DOCKER_IMAGE_TAG,,}
+        docker exec \
+              ${DOCKER_CONTAINER_NAME,,} \
+              bash -c '\
+                apt-get update && \
+                apt-get install -y curl'
       env: 
         TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
     - name: Test the Docker container
       run: |
-        docker exec \
-              ${DOCKER_CONTAINER_NAME,,} \
-              bash -c '\
-                apt-get update && \
-                apt-get install -y curl'
         HTTP_CODE=$(docker exec \
               ${DOCKER_CONTAINER_NAME,,} \
               bash -c 'curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/' \
         ); \
-        \
-        echo $HTTP_CODE; \
+        
         if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
+          echo HTTP code: $HTTP_CODE
           exit 22
         fi
     - name: Deploy
