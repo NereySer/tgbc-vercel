@@ -76,6 +76,7 @@ jobs:
         
         if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
           echo HTTP code: $HTTP_CODE
+          docker logs ${DOCKER_CONTAINER_NAME,,}
           exit 22
         fi
     - name: Deploy
