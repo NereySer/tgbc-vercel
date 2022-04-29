@@ -70,14 +70,10 @@ jobs:
                 apt-get update && \
                 apt-get install -y curl && \
                 curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/' \
-        )
+        ); \
         \
-        echo $HTTP_CODE
         if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
-          echo error
           exit 22
-        else
-          echo ok
         fi
     - name: Deploy
       if: github.ref == 'refs/heads/main' || 
