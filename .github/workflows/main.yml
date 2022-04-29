@@ -12,10 +12,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
-      DOCKER_IMAGE_TAG: '{{ github.repository }}:{{ github.run_id }}'
-      DOCKER_CONTAINER_NAME: '{{ github.repository }}_{{ github.run_id }}'
-    
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.7
@@ -44,6 +40,8 @@ jobs:
         docker start -d --rm --name $DOCKER_CONTAINER_NAME --env PORT=5000 $DOCKER_IMAGE_TAG
         docker exec $DOCKER_CONTAINER_NAME curl http://localhost:5000/
       env: 
+        DOCKER_IMAGE_TAG: '{{ github.repository }}:{{ github.run_id }}'
+        DOCKER_CONTAINER_NAME: '{{ github.repository }}_{{ github.run_id }}'
         TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
