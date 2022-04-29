@@ -68,20 +68,10 @@ jobs:
               ${DOCKER_CONTAINER_NAME,,} \
               bash -c '\
                 apt-get update && \
-                apt-get install -y curl && \
-                curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/'
-        docker exec \
-              ${DOCKER_CONTAINER_NAME,,} \
-              bash -c '\
-                apt-get update && \
-                apt-get install -y curl && \
-                curl http://localhost:5000/'
+                apt-get install -y curl'
         HTTP_CODE=$(docker exec \
               ${DOCKER_CONTAINER_NAME,,} \
-              bash -c '\
-                apt-get update && \
-                apt-get install -y curl && \
-                curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/' \
+              bash -c 'url -sL -o /dev/null -w "%{http_code}" http://localhost:5000/' \
         ); \
         \
         echo $HTTP_CODE; \
