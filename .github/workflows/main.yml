@@ -47,8 +47,8 @@ jobs:
         docker exec ${DOCKER_CONTAINER_NAME,,} curl http://localhost:5000/
         docker stop ${DOCKER_CONTAINER_NAME,,}
       env: 
-        DOCKER_IMAGE_TAG: '${{ github.name }}:${{ github.run_id }}'
-        DOCKER_CONTAINER_NAME: '${{ github.name }}_${{ github.run_id }}'
+        DOCKER_IMAGE_TAG: '${{ github.event.repository.name }}:${{ github.run_id }}'
+        DOCKER_CONTAINER_NAME: '${{ github.event.repository.name }}_${{ github.run_id }}'
         TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
