@@ -44,12 +44,13 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
-    - name: Build the Docker image and test run
+    - name: Build the Docker image
       run: |
         docker build . \
               --file Dockerfile \
               --tag ${DOCKER_IMAGE_TAG,,}
-        
+    - name: Run the Docker image
+      run: |
         docker run \
               -d --rm \
               --name ${DOCKER_CONTAINER_NAME,,} \
@@ -57,8 +58,13 @@ jobs:
               --env TELEGRAM_CHANNEL_ID=$TELEGRAM_CHANNEL_ID \
               --env GOOGLE_CALENDAR_ID=$GOOGLE_CALENDAR_ID \
               ${DOCKER_IMAGE_TAG,,}
-        
-        HTTP_CODE=$(curl -sL -o /dev/null -w "%{http_code}" docker exec \
+      env: 
+        TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
+        TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
+        GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
+    - name: Test the Docker container
+      run: |
+        HTTP_CODE=$(docker exec \
               ${DOCKER_CONTAINER_NAME,,} \
               bash -c '\
                 apt-get update && \
@@ -69,10 +75,6 @@ jobs:
         if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
           exit 22
         fi
-      env: 
-        TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
-        TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
-        GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
     - name: Deploy
       if: github.ref == 'refs/heads/main' || 
           github.ref == 'refs/heads/develop'
