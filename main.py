@@ -3,8 +3,6 @@ import signal
 import telebot
 from flask import Flask
 
-from buzz import generator
-
 from modules import *
 
 bot = telebot.TeleBot(os.getenv('TELEGRAM_BOT_TOKEN'))
@@ -13,8 +11,8 @@ app = Flask(__name__)
 signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 
 @app.route("/")
-def generate_buzz():
-    content = generator.generate_buzz() + '\n'
+def check_events():
+    content = ''
     content += g_cal.get_incomig_events(
         begin = time_limits.getStart(), 
         end = time_limits.getEnd()
