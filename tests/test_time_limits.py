@@ -1,10 +1,11 @@
 import unittest
 
 from datetime import datetime, timezone, timedelta
-from modules import time_limits as t
+
+from modules import time_limits
 
 def test_start_time():
-    timeStart = t.getStart()
+    timeStart = time_limits.getStart()
 
     assert timeStart[-1]=='Z'
     
@@ -15,7 +16,7 @@ def test_start_time():
     assert abs(timeStart - datetime.utcnow()) < timedelta(seconds = 1)
 
 def test_end_time():
-    timeEnd = t.getEnd()
+    timeEnd = time_limits.getEnd()
     
     assert timeEnd[-1]=='Z'
     
@@ -30,8 +31,8 @@ def test_end_time():
     assert timeEnd.second==59
     
 def test_time_difference():
-    timeStart = t.getStart()
-    timeEnd = t.getEnd()
+    timeStart = time_limits.getStart()
+    timeEnd = time_limits.getEnd()
     
     timeStart = datetime.fromisoformat(timeStart[:-1]).astimezone(t.DEFAULT_TIMEZONE)
     timeEnd = datetime.fromisoformat(timeEnd[:-1]).astimezone(t.DEFAULT_TIMEZONE)
