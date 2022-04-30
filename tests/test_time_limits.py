@@ -24,7 +24,7 @@ def test_end_time():
 
     assert timeEnd.tzinfo==None
 
-    timeEnd = timeEnd.replace(tzinfo=timezone.utc).astimezone(t.DEFAULT_TIMEZONE)
+    timeEnd = timeEnd.replace(tzinfo=timezone.utc).astimezone(time_limits.DEFAULT_TIMEZONE)
     
     assert timeEnd.hour==23
     assert timeEnd.minute==59
@@ -34,8 +34,8 @@ def test_time_difference():
     timeStart = time_limits.getStart()
     timeEnd = time_limits.getEnd()
     
-    timeStart = datetime.fromisoformat(timeStart[:-1]).astimezone(t.DEFAULT_TIMEZONE)
-    timeEnd = datetime.fromisoformat(timeEnd[:-1]).astimezone(t.DEFAULT_TIMEZONE)
+    timeStart = datetime.fromisoformat(timeStart[:-1])
+    timeEnd = datetime.fromisoformat(timeEnd[:-1])
     
     diff = timeEnd - timeStart
     
