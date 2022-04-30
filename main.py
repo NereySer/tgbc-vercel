@@ -4,8 +4,8 @@ import telebot
 from flask import Flask
 
 from buzz import generator
-from modules import g_cal
-from modules import time_limits
+
+from modules import *
 
 bot = telebot.TeleBot(os.getenv('TELEGRAM_BOT_TOKEN'))
 app = Flask(__name__)
