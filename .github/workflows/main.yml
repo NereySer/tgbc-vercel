@@ -8,26 +8,17 @@ on:
 
 jobs:
 
-  build:
-
+  unit_test:
+    name: Build and run tests
+    
     runs-on: ubuntu-latest
-
-    env: 
-      DOCKER_IMAGE_TAG: '${{ github.event.repository.name }}:${{ github.run_id }}'
-      DOCKER_CONTAINER_NAME: '${{ github.event.repository.name }}_${{ github.run_id }}'
-
+    
     steps:
     - uses: actions/checkout@v3
-    - name: Dump GitHub context
-      env:
-        DOCKER_IMAGE_TAG: '${{ github.repository }}:${{ github.run_id }}'
-      run: |
-        echo '${{ toJSON(github) }}'
-        echo $DOCKER_IMAGE_TAG
     - name: Set up Python 3.7
       uses: actions/setup-python@v3
       with:
-        python-version: "3.7"
+        python-version: "3.7.12"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -44,12 +35,32 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_TEST_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
+    - name: Clear all
+      if: always()
+      run: |
+        rm key/civil-hash.json || true
+
+  docker_test:
+    name: Build an image and test it
+    
+    runs-on: ubuntu-latest
+
+    env: 
+      DOCKER_IMAGE_TAG: '${{ github.event.repository.name }}:${{ github.run_id }}'
+      DOCKER_CONTAINER_NAME: '${{ github.event.repository.name }}_${{ github.run_id }}'
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create Google API key
+      run: |
+        mkdir key
+        echo '${{secrets.GOOGLE_KEY}}' > key/civil-hash.json
     - name: Build the Docker image
       run: |
         docker build . \
               --file Dockerfile \
               --tag ${DOCKER_IMAGE_TAG,,}
-    - name: Run and prepare the Docker image
+    - name: Run the image and prepare the Docker container
       run: |
         docker run \
               -d --rm \
@@ -80,9 +91,29 @@ jobs:
           docker logs ${DOCKER_CONTAINER_NAME,,}
           exit 22
         fi
+    - name: Clear all
+      if: always()
+      run: |
+        rm key/civil-hash.json || true
+        docker stop ${DOCKER_CONTAINER_NAME,,} || true
+    
+  deploy:
+    name: Deploy to Heroku
+    
+    if: github.ref == 'refs/heads/main' || 
+        github.ref == 'refs/heads/develop'
+    
+    needs: [unit_test, docker_test]
+    
+    runs-on: ubuntu-latest
+        
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create Google API key
+      run: |
+        mkdir key
+        echo '${{secrets.GOOGLE_KEY}}' > key/civil-hash.json
     - name: Deploy
-      if: github.ref == 'refs/heads/main' || 
-          github.ref == 'refs/heads/develop'
       uses: akhileshns/heroku-deploy@v3.12.12
       with:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -97,4 +128,3 @@ jobs:
       if: always()
       run: |
         rm key/civil-hash.json || true
-        docker stop ${DOCKER_CONTAINER_NAME,,} || true
