@@ -13,9 +13,11 @@ signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 @app.route("/")
 def check_events():
     content = ''
+    
+    time_bounds = time_limits.getTimeBounds()
     content += g_cal.get_incomig_events(
-        begin = time_limits.getStart(), 
-        end = time_limits.getEnd()
+        begin = time_bounds['begin'], 
+        end = time_bounds['end']
     )
     
     bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), content)

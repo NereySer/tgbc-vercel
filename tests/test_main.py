@@ -1,5 +1,3 @@
-import unittest
-
 import main
 
 def test_work():

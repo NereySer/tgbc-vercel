@@ -1,13 +1,19 @@
 from datetime import datetime, timezone, timedelta
 
 DEFAULT_TIMEZONE = timezone(timedelta(hours=+3))
+LATE_HOUR = 12
 
-def getStart():
-    return datetime.utcnow().isoformat() + 'Z'
+def getTimeBounds():
+    begin = datetime.now(DEFAULT_TIMEZONE)
 
-def getEnd(): 
-    next_day = datetime.now(DEFAULT_TIMEZONE) + timedelta(days = 1)
+    if begin.hour > LATE_HOUR:
+        begin += timedelta(days = 1)
+        begin = begin.replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    end = begin.replace(hour=23, minute=59, second=59, microsecond=0)
 
-    end_next_day = next_day.replace(hour=23, minute=59, second=59, microsecond=0)
+    return {
+        'begin': begin.astimezone(timezone.utc).replace(tzinfo=None).isoformat() + 'Z', 
+        'end': end.astimezone(timezone.utc).replace(tzinfo=None).isoformat() + 'Z'    
+    }
 
-    return end_next_day.astimezone(timezone.utc).replace(tzinfo=None).isoformat() + 'Z'
