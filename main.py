@@ -12,20 +12,24 @@ signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 
 @app.route("/")
 def check_events():
-    content = ''
+    content = []
     
     time_bounds = time_checks.getTimeBounds()
+    content.append(time_bounds)
+    
     events = g_cal.get_incomig_events(
         begin = time_bounds['begin'], 
         end = time_bounds['end']
     )
+    content.append(events)
     
-    content += message_format.format(events)
+    isTime = time_checks.isTimeToRemind(events)
+    content.append('Is time: ' + str(isTime) )
     
-    bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), content)
+    bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), message_format.format(events))
     
     page = '<html><body><h1>'
-    page += content.replace('\n', '</br>')
+    page += str(content) #.replace('\n', '</br>')
     page += '</h1></body></html>'
     return page
 
