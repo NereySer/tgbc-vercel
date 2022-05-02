@@ -3,4 +3,6 @@ import main
 def test_work():
     tester = main.app.test_client()
     
-    assert tester.get('/') is not None
+    response = tester.get('/')
+    
+    assert response.status_code >= 200 and response.status_code <= 299

@@ -28,9 +28,9 @@ def check_events():
     
     bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), message_format.format(events))
     
-    page = '<html><body><h1>'
-    page += str(content) #.replace('\n', '</br>')
-    page += '</h1></body></html>'
+    page = '<html><body><p>'
+    page += str(content).replace('\n', '</br>')
+    page += '</p></body></html>'
     return page
 
 if __name__ == "__main__":
