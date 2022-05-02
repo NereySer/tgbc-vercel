@@ -29,7 +29,7 @@ def check_events():
     bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), message_format.format(events))
     
     page = '<html><body><p>'
-    page += str(content).replace('\n', '</br>')
+    page += '</p><p>'.join(str(line) for line in content)
     page += '</p></body></html>'
     return page
 
