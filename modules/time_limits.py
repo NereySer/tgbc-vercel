@@ -13,7 +13,7 @@ def getTimeBounds():
     end = begin.replace(hour=23, minute=59, second=59, microsecond=0)
 
     return {
-        'begin': begin.astimezone(timezone.utc).replace(tzinfo=None).isoformat() + 'Z', 
-        'end': end.astimezone(timezone.utc).replace(tzinfo=None).isoformat() + 'Z'    
+        'begin': begin, 
+        'end': end    
     }
 

@@ -5,13 +5,9 @@ from datetime import datetime, timezone, timedelta
 from modules import time_limits
 
 def getTime(time):
-    assert time[-1]=='Z'
+    assert time.tzinfo==time_limits.DEFAULT_TIMEZONE
     
-    time_f = datetime.fromisoformat(time[:-1])
-    
-    assert time_f.tzinfo==None
-    
-    return time_f.replace(tzinfo=timezone.utc).astimezone(time_limits.DEFAULT_TIMEZONE)
+    return time
 
 @pytest.mark.parametrize("set_hour", [9, 10, 12, 13, 23])
 def test_time_bounds(monkeypatch, set_hour):
