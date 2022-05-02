@@ -96,7 +96,8 @@ jobs:
       run: |
         rm key/civil-hash.json || true
         docker stop ${DOCKER_CONTAINER_NAME,,} || true
-    
+        docker rmi ${DOCKER_IMAGE_TAG,,}
+        
   deploy:
     name: Deploy to Heroku
     
