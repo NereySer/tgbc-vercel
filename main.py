@@ -14,7 +14,7 @@ signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 def check_events():
     content = ''
     
-    time_bounds = time_limits.getTimeBounds()
+    time_bounds = time_checks.getTimeBounds()
     events = g_cal.get_incomig_events(
         begin = time_bounds['begin'], 
         end = time_bounds['end']

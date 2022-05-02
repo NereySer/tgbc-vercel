@@ -1,5 +1,5 @@
 from . import (
     g_cal,
-    time_limits,
+    time_checks,
     message_format
 )
