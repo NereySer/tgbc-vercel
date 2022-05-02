@@ -15,10 +15,12 @@ def check_events():
     content = ''
     
     time_bounds = time_limits.getTimeBounds()
-    content += g_cal.get_incomig_events(
+    events = g_cal.get_incomig_events(
         begin = time_bounds['begin'], 
         end = time_bounds['end']
     )
+    
+    content += message_format.format(events)
     
     bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), content)
     
