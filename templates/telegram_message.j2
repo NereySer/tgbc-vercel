@@ -1,0 +1,7 @@
+{% if events %}
+  {% for event in events %}
+{{ event['start'].get('dateTime', event['start'].get('date')) }} {{ event['summary'] }}
+  {% endfor %}
+{% else %}
+No upcoming events found.
+{% endif %}
