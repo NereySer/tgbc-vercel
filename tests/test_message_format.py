@@ -25,5 +25,5 @@ from modules import message_format
     ], '2022-05-03T19:00:00+03:00 test\n2022-05-03T20:00:00+03:00 second_test\n')
 ])
 def test_work(events, expected):
-    assert message_format.format(events) == expected
+    assert message_format.telegram(events) == expected
     

@@ -12,26 +12,23 @@ signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 
 @app.route("/")
 def check_events():
-    content = []
+    content = {}
     
     time_bounds = time_checks.getTimeBounds()
-    content.append(time_bounds)
+    content['time_bounds'] = time_bounds
     
     events = g_cal.get_incomig_events(
         begin = time_bounds['begin'], 
         end = time_bounds['end']
     )
-    content.append(events)
+    content['events'] = events
     
     isTime = time_checks.isTimeToRemind(events)
-    content.append('Is time: ' + str(isTime) )
+    content['isTime'] = isTime
     
-    bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), message_format.format(events))
+    bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), message_format.telegram(events))
     
-    page = '<html><body><p>'
-    page += '</p><p>'.join(str(line) for line in content)
-    page += '</p></body></html>'
-    return page
+    return message_format.web(content)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=os.getenv('PORT')) # port 5000 is the default
