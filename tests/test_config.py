@@ -4,10 +4,11 @@ from datetime import datetime
 def test_work():
     now = datetime.now().isoformat()
     config = Config()
+    
+    tmp = config.last_time
 
     config.last_time = now
 
     assert config.last_time == now
     
-    config.last_time = '0000-00-00T00:00:00'
-    
+    config.last_time = tmp

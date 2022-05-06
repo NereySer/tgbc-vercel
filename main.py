@@ -3,6 +3,8 @@ import signal
 import telebot
 from flask import Flask
 
+from datetime import datetime
+
 from modules import *
 
 bot = telebot.TeleBot(os.getenv('TELEGRAM_BOT_TOKEN'))
@@ -30,11 +32,12 @@ def check_events():
     content['isTime'] = isTime
     content['last_event'] = last_event
     
-    should_remind = isTime and conf.last_time < last_event
+    print(conf.last_time)
+    should_remind = isTime and datetime.fromisoformat(conf.last_time) < last_event
     content['should_remind'] = should_remind
     
     bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), message_format.telegram(events))
-    conf.last_time = last_event
+    conf.last_time = str(last_event)
     
     return message_format.web(content)
 
