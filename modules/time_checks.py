@@ -6,6 +6,7 @@ EVENING_HOUR = 17
 
 def checkEvents(events):
     first_event_datetime = datetime.fromisoformat(events[0]['start'].get('dateTime', events[0]['start'].get('date')))
+    last_event_datetime = first_event_datetime
     
     for event in events:
         event_datetime = datetime.fromisoformat(event['start'].get('dateTime', event['start'].get('date')))
@@ -15,27 +16,30 @@ def checkEvents(events):
         
         if event_datetime < first_event_datetime:
             raise Exception("Events should be sorted")
+            
+        if event_datetime > last_event_datetime:
+            last_event_datetime = event_datetime
     
-    return first_event_datetime
+    return (first_event_datetime, last_event_datetime)
 
-def isTimeToRemind(events) -> bool: 
-    if not events: return False
-    
+def isTimeToRemind(events) -> (bool, datetime): 
     now = datetime.now(DEFAULT_TIMEZONE)
     
-    first_event_datetime = checkEvents(events)
+    if not events: return (False, now)
+    
+    (first_event_datetime, last_event_datetime) = checkEvents(events)
     if now > first_event_datetime: raise Exception("Events in past is not allowed")
     
     if first_event_datetime.date() > now.date() + timedelta(days = 1): 
         #Day after tomorrow no sense to remind
-        return False
+        return (False, last_event_datetime)
     
     if first_event_datetime.date() == now.date(): 
         #Today morning reminder OR daytime reminder
-        return first_event_datetime.hour < EVENING_HOUR or now.hour >= LATE_HOUR - 1
+        return (first_event_datetime.hour < EVENING_HOUR or now.hour >= LATE_HOUR - 1, last_event_datetime)
     else:
         #Evening reminder for early tomorrow events
-        return now.hour > LATE_HOUR and first_event_datetime.hour < LATE_HOUR
+        return (now.hour > LATE_HOUR and first_event_datetime.hour < LATE_HOUR, last_event_datetime)
     
     raise Exception("Something wrong occured")
 

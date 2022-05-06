@@ -10,6 +10,8 @@
       <p>No upcoming events found.</p>
     {% endif %}
     
+    <p>Last event time: {{ content['last_event'] }}</p>
     <p>Time to remind: {{ content['isTime'] }}</p>
+    <p>Should remind: {{ content['should_remind'] }}</p>
   </body>
 </html>

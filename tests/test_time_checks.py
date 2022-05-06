@@ -68,7 +68,9 @@ def test_isTimeToRemind_error_raising(monkeypatch, set_hour, events, exp_raise: 
     #Events in deep future
     (9, [generate_event(9, 2)], False),
     (12, [generate_event(9, 2)], False),
-    (21, [generate_event(9, 2)], False)
+    (21, [generate_event(9, 2)], False),
+    #Check multiple
+    (9, [generate_event(10, 0), generate_event(11, 0), generate_event(15, 0)], True)
 ])
 def test_isTimeToRemind_single_event(monkeypatch, set_hour, events, expected: bool):
     class mock_datetime:
@@ -86,7 +88,11 @@ def test_isTimeToRemind_single_event(monkeypatch, set_hour, events, expected: bo
     
     monkeypatch.setattr(time_checks, 'datetime', mock_datetime)
     
-    assert time_checks.isTimeToRemind(events) == expected
+    isTime, last_event = time_checks.isTimeToRemind(events)
+    
+    assert isTime == expected
+    if isTime:
+        assert last_event == datetime.fromisoformat(events[len(events)-1]['start']['dateTime'])
     
 @pytest.mark.parametrize("set_hour", [9, 10, 12, 13, 23])
 def test_time_bounds(monkeypatch, set_hour):

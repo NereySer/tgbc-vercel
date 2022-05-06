@@ -14,6 +14,9 @@ signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 def check_events():
     content = {}
     
+    conf = config.Config()
+    content['last_time'] = conf.last_time
+    
     time_bounds = time_checks.getTimeBounds()
     content['time_bounds'] = time_bounds
     
@@ -23,10 +26,15 @@ def check_events():
     )
     content['events'] = events
     
-    isTime = time_checks.isTimeToRemind(events)
+    isTime, last_event = time_checks.isTimeToRemind(events)
     content['isTime'] = isTime
+    content['last_event'] = last_event
+    
+    should_remind = isTime and conf.last_time < last_event
+    content['should_remind'] = should_remind
     
     bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), message_format.telegram(events))
+    conf.last_time = last_event
     
     return message_format.web(content)
 
