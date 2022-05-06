@@ -1,6 +1,7 @@
 <html>
   <body>
     <p>Time bounds: {{ content['time_bounds']['begin'] }} - {{ content['time_bounds']['end'] }}</p>
+    <p>Last event notify time: {{ content['last_time'] }}</p>
 
     {% if content['events'] %}
       {% for event in content['events'] %}
