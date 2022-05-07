@@ -16,6 +16,9 @@ signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 def check_events():
     content = {}
     
+    now = datetime.now(time_checks.DEFAULT_TIMEZONE)
+    content['now'] = now
+    
     conf = config.Config()
     content['last_time'] = conf.last_time
     
@@ -36,7 +39,10 @@ def check_events():
     should_remind = isTime and datetime.fromisoformat(conf.last_time) < last_event
     content['should_remind'] = should_remind
     
-    bot.send_message(os.getenv('TELEGRAM_CHANNEL_ID'), message_format.telegram(events))
+    bot.send_message(
+        os.getenv('TELEGRAM_CHANNEL_ID'), 
+        message_format.telegram(events, (last_event.date()-now.date()).days)
+    )
     conf.last_time = str(last_event)
     
     return message_format.web(content)
