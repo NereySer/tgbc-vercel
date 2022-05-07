@@ -11,8 +11,6 @@ jobs:
   unit_test:
     name: Build and run tests
 
-    environment: test
-    
     runs-on: ubuntu-latest
     
     container: python:3.7.12
@@ -54,8 +52,6 @@ jobs:
 
   docker_test:
     name: Build an image and test it
-    
-    environment: test
     
     runs-on: ubuntu-latest
 
