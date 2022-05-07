@@ -68,7 +68,4 @@ def getTimeBounds():
     
     end = begin.replace(hour=23, minute=59, second=59, microsecond=0)
 
-    return {
-        'begin': begin, 
-        'end': end    
-    }
+    return ( begin, end )

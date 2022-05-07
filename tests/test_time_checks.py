@@ -121,10 +121,10 @@ def test_time_bounds(monkeypatch, set_hour):
     now = time_checks.datetime.now(DEFAULT_TIMEZONE)
     assert now.hour==set_hour
 
-    time_bounds = time_checks.getTimeBounds()
+    timeBegin, timeEnd = time_checks.getTimeBounds()
     
-    timeBegin = getTime(time_bounds['begin'])
-    timeEnd = getTime(time_bounds['end'])
+    timeBegin = getTime(timeBegin)
+    timeEnd = getTime(timeEnd)
     
     if days_diff == 0:
         assert abs(timeBegin - now) < timedelta(seconds = 1)

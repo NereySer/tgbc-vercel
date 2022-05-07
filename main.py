@@ -12,39 +12,29 @@ app = Flask(__name__)
 
 signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 
+class Content(object):
+    pass
+
 @app.route("/")
 def check_events():
-    content = {}
+    content = Content()
     
-    now = datetime.now(time_checks.DEFAULT_TIMEZONE)
-    content['now'] = now
+    content.now = datetime.now(time_checks.DEFAULT_TIMEZONE)
     
-    conf = config.Config()
-    content['last_time'] = conf.last_time
+    content.config = config.Config()
     
-    time_bounds = time_checks.getTimeBounds()
-    content['time_bounds'] = time_bounds
+    content.time_bounds = time_checks.getTimeBounds()
     
-    events = g_cal.get_incomig_events(
-        begin = time_bounds['begin'], 
-        end = time_bounds['end']
-    )
-    content['events'] = events
+    content.events = g_cal.get_incomig_events( *content.time_bounds )
     
-    isTime, last_event = time_checks.isTimeToRemind(events)
-    content['isTime'] = isTime
-    content['last_event'] = last_event
+    content.isTime, content.last_event = time_checks.isTimeToRemind(content.events)
     
-    print(conf.last_time)
-    should_remind = isTime and datetime.fromisoformat(conf.last_time) < last_event
-    content['should_remind'] = should_remind
+    content.should_remind = content.isTime and datetime.fromisoformat(content.config.last_time) < content.last_event
     
-    if should_remind:
-        bot.send_message(
-            os.getenv('TELEGRAM_CHANNEL_ID'), 
-            message_format.telegram(events, (last_event.date()-now.date()).days)
-        )
-        conf.last_time = str(last_event)
+    if content.should_remind:
+        bot.send_message( os.getenv('TELEGRAM_CHANNEL_ID'), message_format.telegram(content.events, (content.last_event.date()-content.now.date()).days))
+        
+        content.config.last_time = str(content.last_event)
     
     return message_format.web(content)
 
