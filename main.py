@@ -27,7 +27,6 @@ def check_events():
         end = time_bounds['end']
     )
     content['events'] = events
-    print(events)
     
     isTime, last_event = time_checks.isTimeToRemind(events)
     content['isTime'] = isTime
