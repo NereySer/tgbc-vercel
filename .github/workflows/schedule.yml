@@ -1,0 +1,29 @@
+name: Run application
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '52 11,14,23 * * *'
+
+jobs:
+
+  run:
+    name: Run application
+
+    runs-on: ubuntu-latest
+    
+    environment: 'develop'
+    
+    steps:
+    - name: Curl link
+      env:
+        heroku_app_name: ${{secrets.HEROKU_APP}}
+      run: |
+        HTTP_CODE=$( \
+              bash -c 'curl -sL -o /dev/null -w "%{http_code}" https://${heroku_app_name}.herokuapp.com/' \
+        ); \
+        
+        if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
+          echo HTTP code: $HTTP_CODE
+          exit 22
+        fi
