@@ -20,10 +20,17 @@ jobs:
         heroku_app_name: ${{secrets.HEROKU_APP}}
       run: |
         HTTP_CODE=$( \
-              bash -c 'curl -sL -o /dev/null -w "%{http_code}" https://${heroku_app_name}.herokuapp.com/' \
+              bash -c 'curl -sL -o answer.log -w "%{http_code}" https://${heroku_app_name}.herokuapp.com/' \
         ); \
         
         if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
           echo HTTP code: $HTTP_CODE
           exit 22
+        else
+          cat answer.log
         fi
+    - name: Clear all
+      if: always()
+      run: |
+        rm answer.log || true
+        
