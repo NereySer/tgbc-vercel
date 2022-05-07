@@ -11,18 +11,26 @@ def getTime(time):
     return time
 
 def generate_event(hour, days_add):
-    return {
-        'start': {
-            'dateTime': (datetime.now(DEFAULT_TIMEZONE).replace(hour=hour) + timedelta(days = days_add)).isoformat()
+    if hour == -1:
+        return {
+            'start': {
+                'date': (datetime.now(DEFAULT_TIMEZONE).date() + timedelta(days = days_add)).isoformat()
+            }
         }
-    }
+    else:
+        return {
+            'start': {
+                'dateTime': (datetime.now(DEFAULT_TIMEZONE).replace(hour=hour) + timedelta(days = days_add)).isoformat()
+            }
+        }
 
 @pytest.mark.parametrize("set_hour, events, exp_raise", [
     (9, [generate_event(10, 0)], False),
-    (11, [generate_event(10, 0)], True),
+    (11, [generate_event(10, 0)], False),
     (9, [generate_event(10, 0), generate_event(11, 0)], False),
-    (9, [generate_event(11, 0), generate_event(10, 0)], True),
-    (9, [generate_event(10, 0), generate_event(11, 1)], True)
+    (9, [generate_event(11, 0), generate_event(10, 0)], False),
+    (9, [generate_event(10, 0), generate_event(11, 1)], True),
+    (9, [generate_event(-1, 0)], False)
 ])
 def test_isTimeToRemind_error_raising(monkeypatch, set_hour, events, exp_raise: bool):
     class mock_datetime:
@@ -70,7 +78,9 @@ def test_isTimeToRemind_error_raising(monkeypatch, set_hour, events, exp_raise: 
     (12, [generate_event(9, 2)], False),
     (21, [generate_event(9, 2)], False),
     #Check multiple
-    (9, [generate_event(10, 0), generate_event(11, 0), generate_event(15, 0)], True)
+    (9, [generate_event(10, 0), generate_event(11, 0), generate_event(15, 0)], True),
+    #Check running event
+    (9, [generate_event(-1, 0)], False)
 ])
 def test_isTimeToRemind_single_event(monkeypatch, set_hour, events, expected: bool):
     class mock_datetime:

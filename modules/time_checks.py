@@ -12,35 +12,42 @@ def get_event_start_time(event) -> datetime:
         
     return start_time
 
-def checkEvents(events):
-    first_event_datetime = get_event_start_time(events[0])
-    last_event_datetime = first_event_datetime
-    
+def removeOldEvents(events, now):
+    if not events: return
+
     for event in events:
         event_datetime = get_event_start_time(event)
         
-        if event_datetime.date() != first_event_datetime.date():
-            raise Exception("Events in different days is not allowed")
+        if now > event_datetime: 
+            events.remove(event)
+
+def checkEvents(events):
+    if not events: return (None, None)
         
-        if event_datetime < first_event_datetime:
-            raise Exception("Events should be sorted")
-            
-        if event_datetime > last_event_datetime:
-            last_event_datetime = event_datetime
-    
+    first_event_datetime = get_event_start_time(events[0])
+    last_event_datetime = first_event_datetime
+    events_date = first_event_datetime.date()
+
+    for event in events:
+        event_datetime = get_event_start_time(event)
+        
+        if event_datetime.date() != events_date:
+            raise Exception("Events in different days are not allowed")
+        
+        first_event_datetime = min(event_datetime, first_event_datetime)
+        last_event_datetime = max(event_datetime, last_event_datetime)
+        
     return (first_event_datetime, last_event_datetime)
 
 def isTimeToRemind(events) -> (bool, datetime): 
     now = datetime.now(DEFAULT_TIMEZONE)
     
-    if not events: return (False, now)
-    
+    removeOldEvents(events, now)
     (first_event_datetime, last_event_datetime) = checkEvents(events)
-    if now > first_event_datetime: raise Exception("Events in past is not allowed")
-    
-    if first_event_datetime.date() > now.date() + timedelta(days = 1): 
+
+    if not events or first_event_datetime.date() > now.date() + timedelta(days = 1): 
         #Day after tomorrow no sense to remind
-        return (False, last_event_datetime)
+        return (False, now)
     
     if first_event_datetime.date() == now.date(): 
         #Today morning reminder OR daytime reminder
@@ -65,4 +72,3 @@ def getTimeBounds():
         'begin': begin, 
         'end': end    
     }
-
