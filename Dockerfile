@@ -1,5 +1,5 @@
 #FROM alpine:3.5
-FROM python:3.7.12-slim
+FROM python:3.10-slim
 #RUN apk add --update python py-pip
 
 WORKDIR /src

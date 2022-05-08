@@ -39,24 +39,30 @@ def checkEvents(events):
         
     return (first_event_datetime, last_event_datetime)
 
+def isTodayTimeTiRemind(first_event_datetime, now):
+    #Today morning reminder OR daytime reminder
+    return first_event_datetime.hour < EVENING_HOUR or now.hour >= LATE_HOUR - 1
+
+def isTomorrowTimeTiRemind(first_event_datetime, now):
+    #Evening reminder for early tomorrow events
+    return now.hour > LATE_HOUR and first_event_datetime.hour < LATE_HOUR
+
 def isTimeToRemind(events) -> (bool, datetime): 
     now = datetime.now(DEFAULT_TIMEZONE)
     
     removeOldEvents(events, now)
     (first_event_datetime, last_event_datetime) = checkEvents(events)
 
-    if not events or first_event_datetime.date() > now.date() + timedelta(days = 1): 
-        #Day after tomorrow no sense to remind
+    if not events: 
         return (False, now)
     
-    if first_event_datetime.date() == now.date(): 
-        #Today morning reminder OR daytime reminder
-        return (first_event_datetime.hour < EVENING_HOUR or now.hour >= LATE_HOUR - 1, last_event_datetime)
-    else:
-        #Evening reminder for early tomorrow events
-        return (now.hour > LATE_HOUR and first_event_datetime.hour < LATE_HOUR, last_event_datetime)
-    
-    raise Exception("Something wrong occured")
+    match (first_event_datetime.date() - now.date()).days:
+        case 0:
+            return (isTodayTimeTiRemind(first_event_datetime, now), last_event_datetime)
+        case 1:
+            return (isTomorrowTimeTiRemind(first_event_datetime, now), last_event_datetime)
+        case _:
+            return (False, last_event_datetime)
 
 def getTimeBounds():
     begin = datetime.now(DEFAULT_TIMEZONE)
