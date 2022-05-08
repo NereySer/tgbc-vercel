@@ -1,15 +1,21 @@
-from jinja2 import Template
+from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 
 templates = {}
+env = None
 
 def initTemplate(name: str):
-    global templates
+    global templates, env
+
+    if env is None:
+        env = Environment(
+            loader=FileSystemLoader('templates'),
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
     
     if name not in templates:
-        j2 = open(f'templates/{name}.j2').read()
-        
-        templates[name] = Template(j2, trim_blocks=True, lstrip_blocks=True)
+        templates[name] = env.get_template(f'{name}.j2')
     
     return templates[name]
 

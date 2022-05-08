@@ -24,4 +24,4 @@ def generate_event(hour, text):
     ], 0, 'Сегодня, вторник\n19:00 - test\n20:00 - second_test')
 ])
 def test_work(events, diff, expected):
-    message_format.telegram(events, diff) == expected
+    assert message_format.telegram(events, diff) == expected
