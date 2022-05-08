@@ -1,0 +1,18 @@
+<html>
+  <body>
+    <p>Time bounds: {{ content.time_bounds[0] }} - {{ content.time_bounds[1] }}</p>
+    <p>Last event notify time: {{ content.config.last_time }}</p>
+
+    {% if content.events %}
+      {% for event in content.events %}
+        <p>{{ event['start'].get('dateTime', event['start'].get('date')) }} {{ event['summary'] }}</p>
+      {% endfor %}
+    {% else %}
+      <p>No upcoming events found.</p>
+    {% endif %}
+    
+    <p>Last event time: {{ content.last_event }}</p>
+    <p>Time to remind: {{ content.isTime }}</p>
+    <p>Should remind: {{ content.should_remind }}</p>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+{% if events %}
+  {% from 'macroses.j2' import day_name, start_time %}
+
+  {%- if diff == 0 -%}
+    Сегодня 
+  {%- elif diff == 1 -%}
+    Завтра
+  {%- else -%}
+    {{ datetime.fromisoformat(events[0]['start'].get('dateTime', events[0]['start'].get('date'))).strftime('%d.%m') }}
+  {%- endif -%}
+
+  , {# save space #}
+
+  {{- day_name(datetime.fromisoformat(events[0]['start'].get('dateTime', events[0]['start'].get('date'))).strftime('%w') | int) }}
+
+  {%- if events|length== 1 -%}
+    , {{ events[0]['summary'] }} в {{ start_time(events[0], datetime) }} 
+  {%- else %}
+    {% for event in events +%}
+      {# newline #}
+      {{- start_time(event, datetime) }} - {{ event['summary'] -}}
+    {% endfor %}
+  {% endif %}
+{% else -%}
+  No upcoming events found.
+{% endif %}
