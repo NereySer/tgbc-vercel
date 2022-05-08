@@ -11,8 +11,12 @@ jobs:
     name: Run application
 
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        environment: ['develop', 'main']
     
-    environment: 'develop'
+    environment: ${{ matrix.environment }}
     
     steps:
     - name: Curl link
