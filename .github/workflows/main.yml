@@ -45,6 +45,7 @@ jobs:
         TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
         DATABASE_URL: postgres://postgres:postgres@postgres/postgres
+        CHECK_KEY: ${{secrets.CHECK_KEY}}
     - name: Clear all
       if: always()
       run: |
@@ -93,6 +94,7 @@ jobs:
               --env TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN \
               --env TELEGRAM_CHANNEL_ID=$TELEGRAM_CHANNEL_ID \
               --env GOOGLE_CALENDAR_ID=$GOOGLE_CALENDAR_ID \
+              --env CHECK_KEY=$CHECK_KEY \
               --env DATABASE_URL=postgres://postgres:postgres@$(hostname -I | awk '{print $1}'):${{ job.services.postgres.ports[5432] }}/postgres \
               ${DOCKER_IMAGE_TAG,,}
         docker exec \
@@ -104,11 +106,23 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_ID}}
         GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}      
+        CHECK_KEY: ${{secrets.CHECK_KEY}}
+    - name: Test denied access
+      run: |
+        HTTP_CODE=$(docker exec \
+              ${DOCKER_CONTAINER_NAME,,} \
+              bash -c 'curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/check_events?key=WRONG_KEY' \
+        ); \
+        
+        if [[ ${HTTP_CODE} -ne 404 ]] ; then
+          echo Wrong HTTP code: $HTTP_CODE
+          exit 22
+        fi
     - name: Test the Docker container
       run: |
         HTTP_CODE=$(docker exec \
               ${DOCKER_CONTAINER_NAME,,} \
-              bash -c 'curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/' \
+              bash -c 'curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/check_events?key=${CHECK_KEY}' \
         ); \
         
         if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
@@ -154,6 +168,7 @@ jobs:
         HD_TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
         HD_TELEGRAM_CHANNEL_ID: ${{secrets.TELEGRAM_CHANNEL_ID}}
         HD_GOOGLE_CALENDAR_ID: ${{secrets.GOOGLE_CALENDAR_ID}}
+        HD_CHECK_KEY: ${{secrets.CHECK_KEY}}
     - name: Clear all
       if: always()
       run: |

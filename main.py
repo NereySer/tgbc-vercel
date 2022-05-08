@@ -1,7 +1,7 @@
 import os
 import signal
 import telebot
-from flask import Flask
+from flask import Flask, request
 
 from datetime import datetime
 
@@ -15,8 +15,11 @@ signal.signal(signal.SIGINT, lambda s, f: os._exit(0))
 class Content(object):
     pass
 
-@app.route("/")
+@app.route("/check_events")
 def check_events():
+    if os.getenv('CHECK_KEY') != request.args.get('key', default = '', type = str):
+        return 'Not found', 404
+    
     content = Content()
     
     content.now = datetime.now(time_checks.DEFAULT_TIMEZONE)

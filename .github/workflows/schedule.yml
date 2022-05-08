@@ -18,9 +18,10 @@ jobs:
     - name: Curl link
       env:
         heroku_app_name: ${{secrets.HEROKU_APP}}
+        CHECK_KEY: ${{secrets.CHECK_KEY}}
       run: |
         HTTP_CODE=$( \
-              bash -c 'curl -sL -o answer.log -w "%{http_code}" https://${heroku_app_name}.herokuapp.com/' \
+              bash -c 'curl -sL -o answer.log -w "%{http_code}" https://${heroku_app_name}.herokuapp.com/check_events?key=${CHECK_KEY}' \
         ); \
         
         if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
