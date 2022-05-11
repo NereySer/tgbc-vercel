@@ -9,12 +9,24 @@
     {{ datetime.fromisoformat(events[0]['start'].get('dateTime', events[0]['start'].get('date'))).strftime('%d.%m') }}
   {%- endif -%}
 
-  , {# save space #}
+  , {{ day_name(datetime.fromisoformat(events[0]['start'].get('dateTime', events[0]['start'].get('date'))).strftime('%w') | int) }}
 
-  {{- day_name(datetime.fromisoformat(events[0]['start'].get('dateTime', events[0]['start'].get('date'))).strftime('%w') | int) }}
+  {%- if total_summary != '' -%}
+    , {{ total_summary }}
+  {%- endif %}
 
-  {%- if events|length== 1 -%}
-    , {{ events[0]['summary'] }} в {{ start_time(events[0], datetime) }} 
+  {%- if events[0]['summary'] == '' -%}
+    {# space #} в {# space #}
+      {%- for event in events %}
+        {% if not loop.first %}
+          {% if loop.last -%}
+            {# space #} и {# space #}
+          {%- else -%}
+            , {# space #}
+          {%- endif %}
+        {% endif -%}
+        {{ start_time(event, datetime) }} 
+      {%- endfor %}
   {%- else %}
     {% for event in events +%}
       {# newline #}
