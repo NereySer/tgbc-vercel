@@ -108,7 +108,12 @@ def telegram(events, diff) -> str:
     
     return template.render(total_summary=total_summary, events=events, diff=diff, datetime=datetime)
 
-def web(content, html:bool=True):
+def notifications(content):
+    template = initTemplate('index.html')
+    
+    return template.render(content=content)
+
+def raise_notification(content, html:bool=True):
     template = initTemplate('raise.html' if html else 'raise')
     
     return template.render(content=content)

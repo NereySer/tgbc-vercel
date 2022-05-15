@@ -1,0 +1,13 @@
+<html>
+  <body>
+    {% if content.notification %}
+      <h1>Next notification</h1>
+      <p>Time: approximately {{ content.time }}
+      
+      <p>Text:</p>
+      <pre>{{ content.notification }}</pre>
+    {% else %}
+      <p>No upcoming notifications found in a week.</p>
+    {% endif %}
+  </body>
+</html>
