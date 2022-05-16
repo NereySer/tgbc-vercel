@@ -83,6 +83,16 @@ def test_isTimeToRemind_error_raising(monkeypatch, set_hour, events, exp_raise: 
     (9, [generate_event(-1, 0)], False)
 ])
 def test_isTimeToRemind_single_event(monkeypatch, set_hour, events, expected: bool):
+    test_isTimeToRemind_with_date_single_event(monkeypatch, set_hour, events, expected, None)
+    
+@pytest.mark.parametrize("set_hour, events, expected, use_date", [
+    #Events in deep future, but with date provided
+    (9, [generate_event(10, 2)], True, 2),
+    (9, [generate_event(11, 2)], True, 2),
+    (9, [generate_event(16, 2)], True, 2),
+    (9, [generate_event(17, 2)], False, 2),
+])
+def test_isTimeToRemind_with_date_single_event(monkeypatch, set_hour, events, expected: bool, use_date):
     class mock_datetime:
         @classmethod
         def now(self, tz=None):
@@ -98,11 +108,23 @@ def test_isTimeToRemind_single_event(monkeypatch, set_hour, events, expected: bo
     
     monkeypatch.setattr(time_checks, 'datetime', mock_datetime)
     
-    isTime, last_event = time_checks.isTimeToRemind(events)
+    if use_date is None:
+        isTime, last_event = time_checks.isTimeToRemind(events)
+    else:
+        isTime, last_event = time_checks.isTimeToRemind(events, datetime.now(DEFAULT_TIMEZONE).replace(hour=set_hour) + timedelta(days = use_date))
     
     assert isTime == expected
     if isTime:
         assert last_event == datetime.fromisoformat(events[len(events)-1]['start']['dateTime'])
+    
+@pytest.mark.parametrize("events, expected_hour, expected_day_diff", [
+    #Morning reminders
+    ([generate_event(10, 2)], 21, 1),
+    ([generate_event(12, 2)], 9, 2),
+    ([generate_event(17, 2)], 12, 2)
+])
+def test_whenTimeToRemind(events, expected_hour, expected_day_diff):
+    assert time_checks.whenTimeToRemind(events) == datetime.now(DEFAULT_TIMEZONE).replace(hour=expected_hour, minute = 0, second = 0, microsecond = 0) + timedelta(days = expected_day_diff)
     
 @pytest.mark.parametrize("set_hour", [9, 10, 12, 13, 23])
 def test_time_bounds(monkeypatch, set_hour):
