@@ -1,7 +1,7 @@
 import os
 import signal
 import telebot
-from flask import Flask, request
+from flask import Flask, request, send_from_directory, abort
 
 from datetime import datetime, timedelta
 
@@ -45,11 +45,27 @@ def show_next_notification():
         content.notification = message_format.telegram(events, (time_checks.get_event_start_time(events[0]).date()-content.time.date()).days)
         
     return message_format.notifications(content)
-        
+
+@app.route("/images/<name>")
+def get_image(name):
+
+    try:
+        return send_from_directory('images', filename=name)
+    except FileNotFoundError:
+        abort(404)
+
+@app.route("/css/<name>")
+def get_css(name):
+
+    try:
+        return send_from_directory('css', filename=name)
+    except FileNotFoundError:
+        abort(404)
+
 @app.route("/check_events")
 def check_events():
     if os.getenv('CHECK_KEY') != request.args.get('key', default = '', type = str):
-        return 'Not found', 404
+        abort(404)
     
     content = Content()
     
