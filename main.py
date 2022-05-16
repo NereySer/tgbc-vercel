@@ -50,7 +50,7 @@ def show_next_notification():
 def get_image(name):
 
     try:
-        return send_from_directory('images', filename=name)
+        return send_from_directory('images', name)
     except FileNotFoundError:
         abort(404)
 
@@ -58,7 +58,7 @@ def get_image(name):
 def get_css(name):
 
     try:
-        return send_from_directory('css', filename=name)
+        return send_from_directory('css', name)
     except FileNotFoundError:
         abort(404)
 

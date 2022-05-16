@@ -1,6 +1,22 @@
 import main, os
 from tests import test_message_format
 
+def test_static_files():
+    tester = main.app.test_client()
+    
+    response = tester.get('/images/not_found.jpg')
+    assert response.status_code == 404
+    
+    response = tester.get('/images/profile.jpg')
+    assert response.status_code >= 200 and response.status_code <= 299
+    
+    response = tester.get('/css/not_found.css')
+    assert response.status_code == 404
+    
+    response = tester.get('/css/bootstrap.min.css')
+    assert response.status_code >= 200 and response.status_code <= 299
+
+
 def test_raising():
     tester = main.app.test_client()
     
