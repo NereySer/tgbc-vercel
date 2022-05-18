@@ -1,5 +1,5 @@
 import main, os
-from tests import test_message_format
+from tests.tools import g_cal_event
 
 def test_static_files():
     tester = main.app.test_client()
@@ -46,7 +46,7 @@ def test_notifications(monkeypatch):
     
     print(response.text)
 
-    mock_events = [test_message_format.generate_event(10, 'test event')]
+    mock_events = [g_cal_event(10)]
 
     response = tester.get('/')
     assert response.status_code >= 200 and response.status_code <= 299
