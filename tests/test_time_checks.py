@@ -4,6 +4,7 @@ from datetime import datetime, timezone, timedelta
 
 from modules import time_checks
 from modules.time_checks import DEFAULT_TIMEZONE, LATE_HOUR
+from tests.tools import g_cal_event
 
 def getTime(time):
     assert time.tzinfo==DEFAULT_TIMEZONE
@@ -11,18 +12,7 @@ def getTime(time):
     return time
 
 def generate_event(hour, days_add):
-    if hour == -1:
-        return {
-            'start': {
-                'date': (datetime.now(DEFAULT_TIMEZONE).date() + timedelta(days = days_add)).isoformat()
-            }
-        }
-    else:
-        return {
-            'start': {
-                'dateTime': (datetime.now(DEFAULT_TIMEZONE).replace(hour=hour) + timedelta(days = days_add)).isoformat()
-            }
-        }
+    return g_cal_event(hour, days_add=days_add)
 
 @pytest.mark.parametrize("set_hour, events, exp_raise", [
     (9, [generate_event(10, 0)], False),

@@ -2,14 +2,10 @@ import pytest
 
 from modules import message_format
 from datetime import datetime, timedelta
+from tests.tools import g_cal_event
 
-def generate_event(hour, text):
-    return {
-        'summary': text,
-        'start': {
-            'dateTime': f"2022-05-03T{hour}:00:00+03:00"
-        }
-    }
+def generate_event(hour, text, transparent = False):
+    return g_cal_event(hour, text=text, base_date=datetime.fromisoformat("2022-05-03T00:00:00+03:00"), transparent = transparent)
     
 @pytest.mark.parametrize("events, diff, expected", [
     ([
@@ -46,7 +42,28 @@ def generate_event(hour, text):
     ([
         generate_event(19, 'test: first'),
         generate_event(20, 'test: second_test')
-    ], 0, 'Сегодня, вторник, test\n19:00 - first\n20:00 - second_test')
+    ], 0, 'Сегодня, вторник, test\n19:00 - first\n20:00 - second_test'),
+    #Test events with displaying end time
+    ([
+        generate_event(11, 'test'),
+        generate_event(15, 'test', True),
+        generate_event(19, 'test'),
+        generate_event(20, 'test')
+    ], 0, 'Сегодня, вторник, test в 11:00, с 15:00 до 16:00, в 19:00 и 20:00'),
+    ([
+        generate_event(11, 'test', True),
+        generate_event(15, 'test'),
+        generate_event(19, 'test'),
+        generate_event(20, 'test')
+    ], 0, 'Сегодня, вторник, test с 11:00 до 12:00, в 15:00, 19:00 и 20:00'),
+    ([
+        generate_event(19, 'test: first', True),
+        generate_event(20, 'test: second_test', True)
+    ], 0, 'Сегодня, вторник, test\n19:00-20:00 - first\n20:00-21:00 - second_test'),
+    ([
+        generate_event(19, 'test: first'),
+        generate_event(20, 'test: second_test', True)
+    ], 0, 'Сегодня, вторник, test\n19:00 - first\n20:00-21:00 - second_test')
 ])
 def test_work(events, diff, expected):
     assert message_format.telegram(events, diff) == expected

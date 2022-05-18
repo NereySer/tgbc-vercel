@@ -1,5 +1,5 @@
 {% if events %}
-  {% from 'macroses.j2' import day_name, start_time %}
+  {% from 'macroses.j2' import day_name, start_time, end_time %}
 
   {%- if diff == 0 -%}
     Сегодня 
@@ -16,21 +16,42 @@
   {%- endif %}
 
   {%- if events[0]['summary'] == '' -%}
-    {# space #} в {# space #}
-      {%- for event in events %}
-        {% if not loop.first %}
-          {% if loop.last -%}
-            {# space #} и {# space #}
-          {%- else -%}
-            , {# space #}
-          {%- endif %}
+    {%- set list = namespace(simple = False) -%}
+
+    {# space #} {# space #}
+
+    {%- for event in events %}
+      {% if not loop.first %}
+        {% if loop.last -%}
+          {# space #} и {# space #}
+        {%- else -%}
+          , {# space #}
+        {%- endif %}
+      {% endif -%}
+
+      {% if event['transparency'] == 'transparent' -%} 
+        {% set list.simple = False -%}
+
+        с {{ start_time(event, datetime) }} до {{ end_time(event, datetime) }}
+      {%- else -%}
+        {% if not list.simple -%}
+          в {# space #}
+
+          {%- set list.simple = True -%}
         {% endif -%}
+
         {{ start_time(event, datetime) }} 
-      {%- endfor %}
+      {%- endif %}
+    {%- endfor %}
   {%- else %}
     {% for event in events +%}
       {# newline #}
-      {{- start_time(event, datetime) }} - {{ event['summary'] -}}
+      {{- start_time(event, datetime) }}
+
+      {%- if event['transparency'] == 'transparent' -%} 
+        -{{ end_time(event, datetime) }}
+      {%- endif -%} 
+      {# space #} - {{ event['summary'] -}}
     {% endfor %}
   {% endif %}
 {% else -%}
