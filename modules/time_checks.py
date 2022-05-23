@@ -1,4 +1,4 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date, time
 
 DEFAULT_TIMEZONE = timezone(timedelta(hours=+3))
 LATE_HOUR = 12
@@ -6,12 +6,15 @@ EVENING_HOUR = 17
 
 NOTIFICATIONS_HOURS = [9, 12, 21]
 
-def get_event_start_time(event) -> datetime:
-    start_time = datetime.fromisoformat(event['start'].get('dateTime', event['start'].get('date')))
+def get_event_start_time(event):
+    if 'dateTime' in event['start']:
+        start_time = datetime.fromisoformat(event['start']['dateTime'])
+
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo = DEFAULT_TIMEZONE)
+    else:
+        start_time = date.fromisoformat(event['start']['date'])
     
-    if start_time.tzinfo is None:
-        start_time = start_time.replace(tzinfo = DEFAULT_TIMEZONE)
-        
     return start_time
 
 def removeOldEvents(events, now):
@@ -20,8 +23,39 @@ def removeOldEvents(events, now):
     for event in events:
         event_datetime = get_event_start_time(event)
         
-        if now > event_datetime: 
+        if type(event_datetime) is not date and now > event_datetime: 
             events.remove(event)
+
+def isDatesEqual(date1, date2):
+    if type(date1) is not date:
+        date1 = date1.date()
+
+    if type(date2) is not date:
+        date2 = date2.date()
+
+    return date1 == date2
+
+def minTime(date1, date2):
+    if type(date1) is type(date2):
+        return min(date1, date2)
+    elif type(date1) is not date:
+        return date1
+    else:
+        return date2
+
+def maxTime(date1, date2):
+    if type(date1) is type(date2):
+        return max(date1, date2)
+    elif type(date1) is not date:
+        return date1
+    else:
+        return date2
+
+def addTime(date1):
+    if type(date1) is date:
+        date1 = datetime.combine(date1, time(12, 0, 0), DEFAULT_TIMEZONE)
+
+    return date1
 
 def checkEvents(events):
     if not events: return (None, None)
@@ -32,12 +66,17 @@ def checkEvents(events):
     for event in events:
         event_datetime = get_event_start_time(event)
         
-        if event_datetime.date() != first_event_datetime.date():
+        if not isDatesEqual(event_datetime, first_event_datetime):
+            print(events)
             raise Exception("Events in different days are not allowed")
         
-        first_event_datetime = min(event_datetime, first_event_datetime)
-        last_event_datetime = max(event_datetime, last_event_datetime)
+        first_event_datetime = minTime(event_datetime, first_event_datetime)
+        last_event_datetime = maxTime(event_datetime, last_event_datetime)
         
+
+    first_event_datetime = addTime(first_event_datetime)
+    last_event_datetime = addTime(last_event_datetime)
+
     return (first_event_datetime, last_event_datetime)
 
 def isTodayTimeToRemind(first_event_datetime, now):
@@ -49,7 +88,9 @@ def isTomorrowTimeToRemind(first_event_datetime, now):
     return now.hour > LATE_HOUR and first_event_datetime.hour < LATE_HOUR
 
 def isTimeToRemind(events, date = None) -> (bool, datetime): 
+    print(events)
     now = datetime.now(DEFAULT_TIMEZONE) if date is None else date
+    print(now)
     
     removeOldEvents(events, now)
     (first_event_datetime, last_event_datetime) = checkEvents(events)

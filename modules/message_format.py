@@ -1,5 +1,6 @@
 from jinja2 import Environment, FileSystemLoader
-from datetime import datetime
+from datetime import datetime, timedelta
+from modules.time_checks import DEFAULT_TIMEZONE
 import re
 
 templates = {}
@@ -29,7 +30,6 @@ def getSlicedSummaries(events):
         retVal.append(pattern.split(event['summary']))
 
     return retVal
-
 
 def findCommon(list):
     if not list:
@@ -101,12 +101,32 @@ def splitCommonSummary(events):
 
     return (common_summary.strip(), retEvents)
 
+def popWholeDayEventsSummaries(events):
+    popEvents = []
+
+    for event in events.copy():
+        if 'date' in event['start']:
+            popEvents.append(event['summary'])
+
+            events.remove(event)
+
+    return popEvents
+
 def telegram(events, diff) -> str:
-    total_summary, events = splitCommonSummary(events)
+    events = events.copy()
+
+    total_summary = popWholeDayEventsSummaries(events)
+
+    events_summary, events = splitCommonSummary(events)
+
+    if events_summary != '':
+        total_summary.append(events_summary)
+
+    total_summary = ', '.join(total_summary)
 
     template = initTemplate('telegram_message')
     
-    return template.render(total_summary=total_summary, events=events, diff=diff, datetime=datetime)
+    return template.render(total_summary=total_summary, events=events, diff=timedelta(days=diff), datetime=datetime, DEFAULT_TIMEZONE=DEFAULT_TIMEZONE)
 
 def notifications(content):
     template = initTemplate('notification_template.html')

@@ -1,20 +1,20 @@
+{% from 'macroses.j2' import day_name, start_time, end_time %}
+
+{%- if diff.days == 0 -%}
+  Сегодня 
+{%- elif diff.days == 1 -%}
+  Завтра
+{%- else -%}
+  {{ (datetime.now(DEFAULT_TIMEZONE) + diff).strftime('%d.%m') }}
+{%- endif -%}
+
+, {{ day_name((datetime.now(DEFAULT_TIMEZONE) + diff).isoweekday()) }}
+
+{%- if total_summary != '' -%}
+  , {{ total_summary }}
+{%- endif -%}
+
 {% if events %}
-  {% from 'macroses.j2' import day_name, start_time, end_time %}
-
-  {%- if diff == 0 -%}
-    Сегодня 
-  {%- elif diff == 1 -%}
-    Завтра
-  {%- else -%}
-    {{ datetime.fromisoformat(events[0]['start'].get('dateTime', events[0]['start'].get('date'))).strftime('%d.%m') }}
-  {%- endif -%}
-
-  , {{ day_name(datetime.fromisoformat(events[0]['start'].get('dateTime', events[0]['start'].get('date'))).strftime('%w') | int) }}
-
-  {%- if total_summary != '' -%}
-    , {{ total_summary }}
-  {%- endif %}
-
   {%- if events[0]['summary'] == '' -%}
     {%- set list = namespace(simple = False) -%}
 
@@ -54,6 +54,6 @@
       {# space #} - {{ event['summary'] -}}
     {% endfor %}
   {% endif %}
-{% else -%}
-  No upcoming events found.
+{% elif total_summary == '' %}
+  Ничего не будет.
 {% endif %}

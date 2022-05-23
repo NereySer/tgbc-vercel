@@ -35,6 +35,11 @@ def test_isTimeToRemind_error_raising(monkeypatch, set_hour, events, exp_raise: 
         @classmethod
         def fromisoformat(self, val):
             return datetime.fromisoformat(val)
+
+        @classmethod
+        def combine(self, date, time, tzinfo):
+            return datetime.combine(date, time, tzinfo)
+
     
     monkeypatch.setattr(time_checks, 'datetime', mock_datetime)
     
@@ -68,9 +73,19 @@ def test_isTimeToRemind_error_raising(monkeypatch, set_hour, events, exp_raise: 
     (12, [generate_event(9, 2)], False),
     (21, [generate_event(9, 2)], False),
     #Check multiple
-    (9, [generate_event(10, 0), generate_event(11, 0), generate_event(15, 0)], True),
+    (9, [generate_event(10, 1), generate_event(11, 1), generate_event(15, 1)], False),
+    (12, [generate_event(10, 1), generate_event(11, 1), generate_event(15, 1)], False),
+    (21, [generate_event(10, 1), generate_event(11, 1), generate_event(15, 1)], True),
     #Check running event
-    (9, [generate_event(-1, 0)], False)
+    (12, [generate_event(10, 0)], False),
+    #Check whole-day event
+    (21, [generate_event(-1, 1)], False),
+    (9, [generate_event(-1, 0)], True),
+    (9, [generate_event(-1, 1), generate_event(10, 1), generate_event(11, 1), generate_event(15, 1)], False),
+    (12, [generate_event(-1, 1), generate_event(10, 1), generate_event(11, 1), generate_event(15, 1)], False),
+    (21, [generate_event(-1, 1), generate_event(10, 1), generate_event(11, 1), generate_event(15, 1)], True),
+    (9, [generate_event(-1, 0), generate_event(17, 0)], False),
+    (12, [generate_event(-1, 0), generate_event(17, 0)], True),
 ])
 def test_isTimeToRemind_single_event(monkeypatch, set_hour, events, expected: bool):
     test_isTimeToRemind_with_date_single_event(monkeypatch, set_hour, events, expected, None)
@@ -95,6 +110,10 @@ def test_isTimeToRemind_with_date_single_event(monkeypatch, set_hour, events, ex
         @classmethod
         def fromisoformat(self, val):
             return datetime.fromisoformat(val)
+
+        @classmethod
+        def combine(self, date, time, tzinfo):
+            return datetime.combine(date, time, tzinfo)
     
     monkeypatch.setattr(time_checks, 'datetime', mock_datetime)
     
@@ -105,7 +124,7 @@ def test_isTimeToRemind_with_date_single_event(monkeypatch, set_hour, events, ex
     
     assert isTime == expected
     if isTime:
-        assert last_event == datetime.fromisoformat(events[len(events)-1]['start']['dateTime'])
+        assert last_event == time_checks.addTime(time_checks.get_event_start_time(events[len(events)-1]))
     
 @pytest.mark.parametrize("events, expected_hour, expected_day_diff", [
     #Morning reminders
@@ -124,6 +143,7 @@ def test_time_bounds(monkeypatch, set_hour):
         @classmethod
         def now(self, tz=None):
             return ( datetime.now(DEFAULT_TIMEZONE).replace(hour=set_hour).astimezone(tz) )
+
         @classmethod
         def utcnow(self):
             return ( self.now(timezone.utc) )
