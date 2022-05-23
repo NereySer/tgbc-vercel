@@ -1,4 +1,4 @@
-import main, os
+import main, os, pytest
 from tests.tools import g_cal_event
 
 def test_static_files():
@@ -26,29 +26,63 @@ def test_raising():
     response = tester.get('/check_events?key='+os.getenv('CHECK_KEY'))
     assert response.status_code >= 200 and response.status_code <= 299
 
-def test_notifications(monkeypatch):
+def test_notifications():
     tester = main.app.test_client()
-    
-    response = tester.get('/')
-    assert response.status_code >= 200 and response.status_code <= 299
-    
-    print(response.text)
-    
-    mock_events = []
 
+    response = tester.get('/')
+
+    print(response.text)
+
+    assert response.status_code >= 200 and response.status_code <= 299
+
+@pytest.mark.parametrize("events", [
+    # Test no events
+    ([]),
+    # Test single events
+    ([
+        g_cal_event(10, text = 'text'),
+    ]),
+    ([
+        g_cal_event(13, text = 'text'),
+    ]),
+    ([
+        g_cal_event(19, text = 'text'),
+    ]),
+    ([
+        g_cal_event(10, days_add = 1, text = 'text'),
+    ]),
+    ([
+        g_cal_event(13, days_add = 1, text = 'text'),
+    ]),
+    ([
+        g_cal_event(21, days_add = 1, text = 'text'),
+    ]),
+    ([
+        g_cal_event(-1, text = 'text'),
+    ]),
+    #Test multiple events
+    ([
+        g_cal_event(10, text = 'text'),
+        g_cal_event(13, text = 'text'),
+        g_cal_event(21, text = 'text'),
+    ]),
+    ([
+        g_cal_event(-1, text = 'text'),
+        g_cal_event(13, text = 'text'),
+        g_cal_event(21, text = 'text')
+    ]),
+    ([
+        g_cal_event(10, text = 'text'),
+        g_cal_event(-1, text = 'text'),
+        g_cal_event(21, text = 'text'),
+    ]),
+])
+def test_mock_events(monkeypatch, events):
     def mock_g_cal_get_incomig_events(begin, end):
-        return mock_events
-    
+        return events
+
     monkeypatch.setattr(main.g_cal, 'get_incomig_events', mock_g_cal_get_incomig_events)
 
-    response = tester.get('/')
-    assert response.status_code >= 200 and response.status_code <= 299
-    
-    print(response.text)
+    test_notifications()
 
-    mock_events = [g_cal_event(10)]
-
-    response = tester.get('/')
-    assert response.status_code >= 200 and response.status_code <= 299
-    
-    print(response.text)
+    test_raising()
