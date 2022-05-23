@@ -4,6 +4,9 @@ from modules import message_format
 from datetime import datetime, timedelta
 from tests.tools import g_cal_event
 
+class Content(object):
+    pass
+
 def generate_event(hour, text, transparent = False):
     return g_cal_event(hour, text=text, transparent = transparent, base_date = datetime.now().replace(minute=0))
     
@@ -79,6 +82,12 @@ def generate_event(hour, text, transparent = False):
 def test_work(monkeypatch, events, diff, expected):
     base_date=datetime.fromisoformat("2022-05-03T00:00:00+03:00")
 
+    content = Content()
+
+    content.events = events
+    content.now = base_date
+    content.last_event = base_date + timedelta(days=diff)
+
     class mock_datetime:
         @classmethod
         def now(self, tz=None):
@@ -94,4 +103,4 @@ def test_work(monkeypatch, events, diff, expected):
 
     monkeypatch.setattr(message_format, 'datetime', mock_datetime)
 
-    assert message_format.telegram(events, diff) == expected
+    assert message_format.telegram(content) == expected
