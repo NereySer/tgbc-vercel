@@ -3,7 +3,7 @@ import signal
 import telebot
 from flask import Flask, request, send_from_directory, abort
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from modules import *
 
@@ -42,7 +42,12 @@ def show_next_notification():
     if events:
         content.time = time_checks.whenTimeToRemind(events)
         
-        content.notification = message_format.telegram(events, (time_checks.get_event_start_time(events[0]).date()-content.time.date()).days)
+        events_date = time_checks.get_event_start_time(events[0])
+        
+        if type(events_date) is not date:
+            events_date = events_date.date()
+        
+        content.notification = message_format.telegram(events, (events_date-content.time.date()).days)
         
     return message_format.notifications(content)
 

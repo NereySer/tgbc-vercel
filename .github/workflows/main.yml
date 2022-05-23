@@ -129,6 +129,17 @@ jobs:
           echo HTTP code: $HTTP_CODE
           exit 22
         fi
+    - name: Test next notification
+      run: |
+        HTTP_CODE=$(docker exec \
+              ${DOCKER_CONTAINER_NAME,,} \
+              bash -c 'curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/' \
+        ); \
+        
+        if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
+          echo HTTP code: $HTTP_CODE
+          exit 22
+        fi
     - name: Clear all
       if: always()
       run: |
