@@ -1,5 +1,5 @@
 from jinja2 import Environment, FileSystemLoader
-from datetime import datetime, timedelta
+from copy import deepcopy as copy
 import re
 
 templates = {}
@@ -100,45 +100,27 @@ def splitCommonSummary(events):
 
     return (common_summary.strip(), retEvents)
 
-def popWholeDayEventsSummaries(events):
-    popEvents = []
-
-    for event in events.copy():
-        if 'date' in event['start']:
-            popEvents.append(event['summary'])
-
-            events.remove(event)
-
-    return popEvents
-
 def telegram(content) -> str:
-    events = content.events.copy()
+    events = copy(content.events)
 
-    total_summary = popWholeDayEventsSummaries(events)
-
-    events_summary, events = splitCommonSummary(events)
+    events_summary, events.timed = splitCommonSummary(events.timed)
 
     if events_summary != '':
-        total_summary.append(events_summary)
-
-    total_summary = ', '.join(total_summary)
+        events.total.append(events_summary)
 
     template = initTemplate('telegram_message')
-    
+
     return template.render(
-        total_summary=total_summary,
-        events=events,
-        diff=content.last_event.date()-content.now.date(),
-        datetime=datetime,
-        now=content.now
+        events = events,
+        send_time = content.now
     )
 
 def notifications(content):
     template = initTemplate('notification_template.html')
-    
+
     return template.render(content=content)
 
 def raise_notification(content, html:bool=True):
     template = initTemplate('raise.html' if html else 'raise')
-    
+
     return template.render(content=content)

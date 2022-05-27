@@ -1,26 +1,33 @@
-{% from 'macroses.j2' import day_name, start_time, end_time %}
+{% from 'macroses.j2' import day_name, start_time, end_time, diff %}
 
-{%- if diff.days == 0 -%}
+{%- if diff(send_time, events.date) == '0' -%}
   Сегодня 
-{%- elif diff.days == 1 -%}
+{%- elif diff(send_time, events.date) == '1' -%}
   Завтра
 {%- else -%}
-  {{ (now + diff).strftime('%d.%m') }}
+  {{ events.date.strftime('%d.%m') }}
 {%- endif -%}
 
-, {{ day_name((now + diff).isoweekday()) }}
+, {{ day_name(events.date.isoweekday()) }}
 
-{%- if total_summary != '' -%}
-  , {{ total_summary }}
+{%- if events.total != [] -%}
+  {%- if events.total | length == 1 -%}
+    , {{ events.total[0] }}
+  {%- else -%}
+    {% for total_summary in events.total +%}
+      {# newline #}
+      {{- total_summary -}}
+    {% endfor %}
+  {%- endif -%}
 {%- endif -%}
 
-{% if events %}
-  {%- if events[0]['summary'] == '' -%}
+{% if events.timed %}
+  {%- if events.timed[0]['summary'] == '' -%}
     {%- set list = namespace(simple = False) -%}
 
     {# space #} {# space #}
 
-    {%- for event in events %}
+    {%- for event in events.timed %}
       {% if not loop.first %}
         {% if loop.last -%}
           {# space #} и {# space #}
@@ -32,7 +39,7 @@
       {% if event['transparency'] == 'transparent' -%} 
         {% set list.simple = False -%}
 
-        с {{ start_time(event, datetime) }} до {{ end_time(event, datetime) }}
+        с {{ start_time(event) }} до {{ end_time(event) }}
       {%- else -%}
         {% if not list.simple -%}
           в {# space #}
@@ -40,20 +47,20 @@
           {%- set list.simple = True -%}
         {% endif -%}
 
-        {{ start_time(event, datetime) }} 
+        {{ start_time(event) }} 
       {%- endif %}
     {%- endfor %}
   {%- else %}
-    {% for event in events +%}
+    {% for event in events.timed +%}
       {# newline #}
-      {{- start_time(event, datetime) }}
+      {{- start_time(event) }}
 
       {%- if event['transparency'] == 'transparent' -%} 
-        -{{ end_time(event, datetime) }}
+        -{{ end_time(event) }}
       {%- endif -%} 
       {# space #} - {{ event['summary'] -}}
     {% endfor %}
   {% endif %}
-{% elif total_summary == '' %}
+{% elif events.total == [] %}
   Ничего не будет.
 {% endif %}

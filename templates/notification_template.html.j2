@@ -69,7 +69,7 @@
         border-radius: 15px;
         font-weight: 600;
     ">
-    <p style="color:white; margin: 0;">{{ content.time.strftime('%d %B') }}</p>
+    <p style="color:white; margin: 0;">{{ content.now.strftime('%d %B') }}</p>
     </span>
     </div>
 
@@ -80,7 +80,7 @@
     <div class="message-text whatsapp-text telegram-text">
     <p>{{ content.notification  }}</p>
     <div class="telegram-meassage-time-status">
-    <span>{{ content.time.strftime('%H:%M') }}</span>
+    <span>{{ content.now.strftime('%H:%M') }}</span>
     </div>
     </div>
     <div class="telegram-received-carat"><img alt="image" src="images/anroid-telegram-left-carat.png"></div>

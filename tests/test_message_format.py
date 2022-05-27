@@ -1,6 +1,7 @@
 import pytest
 
 from modules import message_format
+from modules.g_cal import Events
 from datetime import datetime, timedelta
 from tests.tools import g_cal_event
 
@@ -9,7 +10,7 @@ class Content(object):
 
 def generate_event(hour, text, transparent = False):
     return g_cal_event(hour, text=text, transparent = transparent, base_date = datetime.now().replace(minute=0))
-    
+
 @pytest.mark.parametrize("events, diff, expected", [
     ([
         generate_event(19, 'test')
@@ -57,50 +58,37 @@ def generate_event(hour, text, transparent = False):
         generate_event(11, 'test', True),
         generate_event(15, 'test'),
         generate_event(19, 'test'),
-        generate_event(20, 'test')
+        generate_event(20, 'test'),
     ], 0, 'Сегодня, вторник, test с 11:00 до 12:00, в 15:00, 19:00 и 20:00'),
     ([
         generate_event(19, 'test: first', True),
-        generate_event(20, 'test: second_test', True)
+        generate_event(20, 'test: second_test', True),
     ], 0, 'Сегодня, вторник, test\n19:00-20:00 - first\n20:00-21:00 - second_test'),
     ([
         generate_event(19, 'test: first'),
-        generate_event(20, 'test: second_test', True)
+        generate_event(20, 'test: second_test', True),
     ], 0, 'Сегодня, вторник, test\n19:00 - first\n20:00-21:00 - second_test'),
     #Test whole day events
     ([
         generate_event(-1, 'whole day'),
+    ], 0, 'Сегодня, вторник, whole day'),
+    ([
+        generate_event(-1, 'whole day'),
         generate_event(-1, 'test'),
         generate_event(19, 'test'),
-        generate_event(20, 'test')
-    ], 0, 'Сегодня, вторник, whole day, test, test в 19:00 и 20:00'),
+        generate_event(20, 'test'),
+    ], 0, 'Сегодня, вторник\nwhole day\ntest\ntest в 19:00 и 20:00'),
     ([
         generate_event(-1, 'test'),
-        generate_event(-1, 'test2')
-    ], 0, 'Сегодня, вторник, test, test2')
+        generate_event(-1, 'test2'),
+    ], 0, 'Сегодня, вторник\ntest\ntest2'),
 ])
-def test_work(monkeypatch, events, diff, expected):
+def test_work(events, diff, expected):
     base_date=datetime.fromisoformat("2022-05-03T00:00:00+03:00")
 
     content = Content()
 
-    content.events = events
+    content.events = Events(events, base_date + timedelta(days=diff))
     content.now = base_date
-    content.last_event = base_date + timedelta(days=diff)
-
-    class mock_datetime:
-        @classmethod
-        def now(self, tz=None):
-            return ( base_date.astimezone(tz) )
-
-        @classmethod
-        def utcnow(self):
-            return ( self.now(timezone.utc) )
-
-        @classmethod
-        def fromisoformat(self, val):
-            return datetime.fromisoformat(val)
-
-    monkeypatch.setattr(message_format, 'datetime', mock_datetime)
 
     assert message_format.telegram(content) == expected
