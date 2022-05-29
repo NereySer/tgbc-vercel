@@ -10,7 +10,7 @@
 
 , {{ day_name(events.date.isoweekday()) }}
 
-{%- if events.total != [] -%}
+{%- if events.total -%}
   {%- if events.total | length == 1 -%}
     , {{ events.total[0] }}
   {%- else -%}
@@ -61,6 +61,6 @@
       {# space #} - {{ event['summary'] -}}
     {% endfor %}
   {% endif %}
-{% elif events.total == [] %}
+{% elif not events.total %}
   Ничего не будет.
 {% endif %}

@@ -3,7 +3,7 @@ import signal
 import telebot
 from flask import Flask, request, send_from_directory, abort
 
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 from modules import *
 
