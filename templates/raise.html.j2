@@ -4,8 +4,12 @@
     <p>Last event notify time: {{ content.config.last_time }}</p>
 
     {% if content.events %}
-      {% for event in content.events %}
-        <p>{{ event['start'].get('dateTime', event['start'].get('date')) }} {{ event['summary'] }}</p>
+      Events date: {{ content.events.date }}
+      {% for event in content.events.total %}
+        <p>{{ event }}</p>
+      {% endfor %}
+      {% for event in content.events.timed %}
+        <p>{{ event['start'] }}-{{ event['end'] }} ({{ event['transparency'] }}) -  {{ event['summary'] }}</p>
       {% endfor %}
     {% else %}
       <p>No upcoming events found.</p>
@@ -13,6 +17,5 @@
     
     <p>Last event time: {{ content.last_event }}</p>
     <p>Time to remind: {{ content.isTime }}</p>
-    <p>Should remind: {{ content.should_remind }}</p>
   </body>
 </html>

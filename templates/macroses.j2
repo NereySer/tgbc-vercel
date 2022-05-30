@@ -16,10 +16,14 @@
   {%- endif %}
 {% endmacro %}
 
-{% macro start_time(event, datetime) -%}
-  {{ datetime.fromisoformat(event['start'].get('dateTime', event['start'].get('date'))).strftime('%H:%M') }}
+{% macro start_time(event) -%}
+  {{ event['start'].strftime('%H:%M') }}
 {%- endmacro %}
 
-{% macro end_time(event, datetime) -%}
-  {{ datetime.fromisoformat(event['end'].get('dateTime', event['end'].get('date'))).strftime('%H:%M') }}
+{% macro end_time(event) -%}
+  {{ event['end'].strftime('%H:%M') }}
+{%- endmacro %}
+
+{% macro diff(begin, end) -%}
+  {{ (end.date() - begin.date()).days }}
 {%- endmacro %}

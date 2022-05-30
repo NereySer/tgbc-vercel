@@ -129,6 +129,17 @@ jobs:
           echo HTTP code: $HTTP_CODE
           exit 22
         fi
+    - name: Test next notification
+      run: |
+        HTTP_CODE=$(docker exec \
+              ${DOCKER_CONTAINER_NAME,,} \
+              bash -c 'curl -sL -o /dev/null -w "%{http_code}" http://localhost:5000/' \
+        ); \
+        
+        if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
+          echo HTTP code: $HTTP_CODE
+          exit 22
+        fi
     - name: Clear all
       if: always()
       run: |
@@ -173,3 +184,30 @@ jobs:
       if: always()
       run: |
         rm key/civil-hash.json || true
+
+  cronjob:
+    name: Create cronjob
+    
+    if: github.ref == 'refs/heads/main' || 
+        github.ref == 'refs/heads/develop'
+    
+    needs: [deploy]
+
+    environment: ${{ github.ref == 'refs/heads/main' && 'main' || 'develop' }}
+    
+    runs-on: ubuntu-latest
+
+    container: python:3.10
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip3 install -r .github/tools/requirements.txt
+    - name: Create cronjob
+      run: python3 .github/tools/create_cronjob.py --title "$TITLE" --url $APP_URL --hours 9 12 21
+      env: 
+        APP_URL: https://${{secrets.HEROKU_APP}}.herokuapp.com/check_events?key=${{secrets.CHECK_KEY}}
+        TITLE: Heroku app ${{secrets.HEROKU_APP}} job from github
+        CRONJOB_API_KEY: ${{secrets.CRONJOB_API_KEY}}

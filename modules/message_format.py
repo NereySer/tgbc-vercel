@@ -1,5 +1,5 @@
 from jinja2 import Environment, FileSystemLoader
-from datetime import datetime
+from copy import deepcopy as copy
 import re
 
 templates = {}
@@ -29,7 +29,6 @@ def getSlicedSummaries(events):
         retVal.append(pattern.split(event['summary']))
 
     return retVal
-
 
 def findCommon(list):
     if not list:
@@ -101,19 +100,27 @@ def splitCommonSummary(events):
 
     return (common_summary.strip(), retEvents)
 
-def telegram(events, diff) -> str:
-    total_summary, events = splitCommonSummary(events)
+def telegram(content) -> str:
+    events = copy(content.events)
+
+    events_summary, events.timed = splitCommonSummary(events.timed)
+
+    if events_summary != '':
+        events.total.append(events_summary)
 
     template = initTemplate('telegram_message')
-    
-    return template.render(total_summary=total_summary, events=events, diff=diff, datetime=datetime)
+
+    return template.render(
+        events = events,
+        send_time = content.now
+    )
 
 def notifications(content):
     template = initTemplate('notification_template.html')
-    
+
     return template.render(content=content)
 
 def raise_notification(content, html:bool=True):
     template = initTemplate('raise.html' if html else 'raise')
-    
+
     return template.render(content=content)
