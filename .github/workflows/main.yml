@@ -184,3 +184,26 @@ jobs:
       if: always()
       run: |
         rm key/civil-hash.json || true
+
+  cronjob:
+    name: Create cronjob
+    
+    if: github.ref == 'refs/heads/main' || 
+        github.ref == 'refs/heads/develop'
+    
+    needs: [deploy]
+
+    environment: ${{ github.ref == 'refs/heads/main' && 'main' || 'develop' }}
+    
+    runs-on: ubuntu-latest
+
+    container: python:3.10
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create cronjob
+      run: python3 .github/tools/create_cronjob.py --title $TITLE --url $APP_URL --hours 9 12 21
+      env: 
+        APP_URL: https://${{secrets.HEROKU_APP}}.herokuapp.com/check_events?key=${{secrets.CHECK_KEY}}
+        TITLE: Heroku app ${{secrets.HEROKU_APP}} job from github
+        CRONJOB_API_KEY: ${{secrets.CRONJOB_API_KEY}}

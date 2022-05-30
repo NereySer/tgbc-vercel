@@ -1,0 +1,35 @@
+{
+    "job": {
+        "enabled": true,
+        "title": "",
+        "saveResponses": true,
+        "url": "",
+        "auth": {
+            "enable": false,
+            "user": "",
+            "password": ""
+        },
+        "notification": {
+            "onFailure": true,
+            "onSuccess": true,
+            "onDisable": true
+        },
+        "extendedData": {
+            "headers": [],
+            "body": ""
+        },
+        "type": 0,
+        "requestTimeout": 30,
+        "redirectSuccess": false,
+        "schedule": {
+            "timezone": "Europe/Moscow",
+            "hours": [],
+            "mdays": [-1],
+            "minutes": [0],
+            "months": [-1],
+            "wdays": [-1]
+        },
+
+        "requestMethod": 0
+    }
+}
