@@ -16,33 +16,43 @@ class Content(object):
     pass
 
 def getNextEvents(now, begin_time):
+    events_col = []
+
     time_bounds = time_checks.getTimeBounds(begin_time)
 
-    while not (events := g_cal.get_incomig_events( *time_bounds )):
-        if time_bounds[0] - now > timedelta(days = 7):
-            break
+    while time_bounds[0] - now <= timedelta(days = 7):
+        events = g_cal.get_incomig_events( *time_bounds )
+
+        if events:
+            events_col.append(events)
 
         time_bounds = (
             time_checks.setDateToBeginOfDay(time_bounds[0] + timedelta(days = 1)),
             time_bounds[1] + timedelta(days = 1)
         )
 
-    return events
+    return events_col
 
 @app.route("/")
-def show_next_notification():
+def show_next_notifications():
     content = Content()
 
     content.now = datetime.now(time_checks.DEFAULT_TIMEZONE)
 
     content.config = config.Config()
 
-    content.events = getNextEvents(content.now, datetime.fromisoformat(content.config.last_time))
+    events_col = getNextEvents(content.now, datetime.fromisoformat(content.config.last_time))
 
-    if content.events:
-        content.now = time_checks.whenTimeToRemind(content.events)
+    content.notifications = []
 
-        content.notification = message_format.telegram(content)
+    for events in events_col:
+        notification = Content()
+
+        notification.events = events
+        notification.time = time_checks.whenTimeToRemind(events)
+        notification.text = message_format.telegram(notification)
+
+        content.notifications.append(notification)
 
     return message_format.notifications(content)
 
@@ -69,7 +79,7 @@ def check_events():
 
     content = Content()
 
-    content.now = datetime.now(time_checks.DEFAULT_TIMEZONE)
+    content.time = datetime.now(time_checks.DEFAULT_TIMEZONE)
 
     content.config = config.Config()
 

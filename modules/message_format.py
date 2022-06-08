@@ -112,7 +112,7 @@ def telegram(content) -> str:
 
     return template.render(
         events = events,
-        send_time = content.now
+        send_time = content.time
     )
 
 def notifications(content):

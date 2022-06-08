@@ -59,7 +59,8 @@
 <div class="clearfix"></div>
 </div>
 
-{% if content.notification %}
+{% if content.notifications %}
+{% for notification in content.notifications %}
     <div>
     <span style="
         margin: 20px auto 10px auto;
@@ -69,7 +70,7 @@
         border-radius: 15px;
         font-weight: 600;
     ">
-    <p style="color:white; margin: 0;">{{ content.now.strftime('%d %B') }}</p>
+    <p style="color:white; margin: 0;">{{ notification.time.strftime('%d %B') }}</p>
     </span>
     </div>
 
@@ -78,9 +79,9 @@
     <div class="message-message u-tableCell u-alignBottom">
     <div class="message-bubble Caret Caret-right whatsapp-caret">
     <div class="message-text whatsapp-text telegram-text">
-    <p>{{ content.notification  }}</p>
+    <p>{{ notification.text  }}</p>
     <div class="telegram-meassage-time-status">
-    <span>{{ content.now.strftime('%H:%M') }}</span>
+    <span>{{ notification.time.strftime('%H:%M') }}</span>
     </div>
     </div>
     <div class="telegram-received-carat"><img alt="image" src="images/anroid-telegram-left-carat.png"></div>
@@ -94,6 +95,7 @@
     </div>
     <div class="clearfix"></div>
     </div>
+{% endfor %}
 {% else %}
     <div class="message message-received is-not remove">
     <div class="message-container u-table telegram-received">

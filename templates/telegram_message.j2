@@ -8,7 +8,7 @@
   {{ events.date.strftime('%d.%m') }}
 {%- endif -%}
 
-, {{ day_name(events.date.isoweekday()) }}
+{# space #} {{ day_name(events.date.isoweekday()) }}
 
 {%- if events.total -%}
   {%- if events.total | length == 1 -%}
