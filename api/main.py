@@ -101,6 +101,9 @@ def check_events():
 def check_redis():
     r = redis.from_url(os.getenv('KV_URL'))
 
+    if not r.exists("test"):
+        r.set('test',1)
+
     last = r.get('test')
     r.set('test',last+1)
     current = r.get('test')
