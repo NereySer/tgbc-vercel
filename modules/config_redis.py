@@ -1,9 +1,16 @@
 import os, redis
 
+_DEFAULT_VALUES=dict(
+    last_time = '0001-01-01T00:00:00+00:00',
+)
+
 class Config(object):
-    _DEFAULT_VALUES=dict(
-        last_time = '0001-01-01T00:00:00+00:00',
-    )
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __init__(self, prefix):
         self._config = {}
@@ -20,8 +27,8 @@ class Config(object):
 
     def __getattr__(self, key):
         value = self._redis.get(self._format_key(key))
-        if value is None and key in self._DEFAULT_VALUES:
-            value = self._DEFAULT_VALUES[key]
+        if value is None and key in _DEFAULT_VALUES:
+            value = _DEFAULT_VALUES[key]
 
         self._config[key] = value
         setattr(type(self), key, property(lambda self: self._getter(key), lambda self, value: self._setter(key, value)))
