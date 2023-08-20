@@ -99,7 +99,7 @@ def check_events():
 
 @app.route("/check_redis")
 def check_redis():
-    r = redis.from_url(os.getenv('KV_URL'))
+    r = redis.Redis.from_url(os.getenv('KV_URL'))
 
     if not r.exists("test"):
         r.set('test',1)
