@@ -101,6 +101,7 @@ def check_events():
 def check_redis():
     r = redis.Redis.from_url(
         os.getenv('KV_URL'),
+        charset="utf-8",
         decode_responses=True)
 
     if not r.exists("test"):
