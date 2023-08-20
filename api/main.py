@@ -111,6 +111,8 @@ def check_redis():
     r.set('test',int(last)+1, ex=15)
     current = r.get('test')
 
+    r.delete('test_last_time')
+
     return f"""{last}
              {current}
               redis test done"""
