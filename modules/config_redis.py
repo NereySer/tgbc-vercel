@@ -24,7 +24,7 @@ class Config(object):
             value = self._DEFAULT_VALUES[key]
 
         self._config[key] = value
-        setattr(self, key, property(lambda self: self._getter(key), lambda self, value: self._setter(key, value)))
+        setattr(type(self), key, property(lambda self: self._getter(key), lambda self, value: self._setter(key, value)))
 
         return value + " - getattr"
 
