@@ -37,7 +37,7 @@ class Config(object):
         self._config[key] = value
         setattr(type(self), key, property(lambda self: self._getter(key), lambda self, value: self._setter(key, value)))
 
-        return value + " - getattr"
+        return value
 
     def _getter(self, key):
         return self._config[key]
