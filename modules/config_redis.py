@@ -35,3 +35,5 @@ class Config(object):
         self._config[key] = value
 
         self._redis.set(self._format_key(key), value)
+
+        return f"{self._format_key(key)} {value} {self._redis.get(self._format_key(key))}"
