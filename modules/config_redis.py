@@ -12,7 +12,7 @@ class Config(object):
           decode_responses=True,
         )
 
-    def _format_key(key):
+    def _format_key(self, key):
         return f"{self._prefix}_{key}"
 
     def __getattr__(self, key):
