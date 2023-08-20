@@ -5,16 +5,18 @@ _DEFAULT_VALUES=dict(
 )
 
 class Config(object):
-    _instance = None
+    _instances = {}
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
+    def __new__(cls, prefix, *args, **kwargs):
+        if not prefix in cls._instances:
+            cls._instances[prefix] = super().__new__(cls)
+        return cls._instances[prefix]
 
     def __init__(self, prefix):
-        self._config = {}
-        self._prefix = prefix
+        if not self.get('_init_done', False):
+            self._init_done = True
+            self._config = {}
+            self._prefix = prefix
 
         self._redis = redis.Redis.from_url(
           os.getenv('KV_URL').replace("redis://", "rediss://"),
@@ -26,6 +28,8 @@ class Config(object):
         return f"{self._prefix}_{key}"
 
     def __getattr__(self, key):
+        if key[0] == '_': raise AttributeError()
+
         value = self._redis.get(self._format_key(key))
         if value is None and key in _DEFAULT_VALUES:
             value = _DEFAULT_VALUES[key]
