@@ -98,10 +98,18 @@ def check_events():
 
 @app.route("/check_redis")
 def check_redis():
+    r = redis.from_url(os.getenv('KV_URL'))
+
+    last = r.get('test')
+    r.set('test',last+1)
+    current = r.get('test')
+    
     return f"""{os.getenv('KV_URL')}
              {os.getenv('KV_REST_API_URL')}
              {os.getenv('KV_REST_API_TOKEN')}
              {os.getenv('KV_REST_API_READ_ONLY_TOKEN')}
+             {last}
+             {current}
               redis test done"""
 
 if __name__ == "__main__":
