@@ -98,11 +98,11 @@ def check_events():
 
 @app.route("/check_redis")
 def check_redis():
-    return f"{os.getenv('KV_URL'))}
+    return f"""{os.getenv('KV_URL'))}
              {os.getenv('KV_REST_API_URL'))}
              {os.getenv('KV_REST_API_TOKEN'))}
              {os.getenv('KV_REST_API_READ_ONLY_TOKEN'))}
-              redis test done"
+              redis test done"""
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=os.getenv('PORT')) # port 5000 is the default
