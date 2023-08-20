@@ -123,5 +123,11 @@ def redis_creds():
              {os.getenv('KV_REST_API_READ_ONLY_TOKEN')}
               redis test done"""
 
+@app.route("/redis_config")
+def redis_config():
+    config = config_redis.Config("test")
+
+    return config.last_time
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=os.getenv('PORT')) # port 5000 is the default
