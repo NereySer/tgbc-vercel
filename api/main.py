@@ -127,6 +127,14 @@ def redis_creds():
 def redis_config():
     config = config_redis.Config("test")
 
+    last = config.last_time
+    config.last_time = '0002-01-01T00:00:00+00:00'
+    current = config.last_time
+
+    return f"""{last}
+             {current}
+              redis test done"""
+    
     return config.last_time
 
 if __name__ == "__main__":
