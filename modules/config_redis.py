@@ -37,6 +37,6 @@ class Config(object):
 
     def __setattr__(self, key, value):
         if key[0] == '_':
-            setattr(self, key, value)
+            self.__dict__[key] = value
         else:
             self._redis.set(self._format_key(key), value)
