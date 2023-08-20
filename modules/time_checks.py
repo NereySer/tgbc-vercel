@@ -50,13 +50,13 @@ def isItTimeToRemind(events, date = None):
 
     first_event_datetime = checkEvents(events)
 
-    match (first_event_datetime.date() - now.date()).days:
-        case 0:
-            return (isTodayTimeToRemind(first_event_datetime, now), events)
-        case 1:
-            return (isTomorrowTimeToRemind(first_event_datetime, now), events)
-        case _:
-            return (False, events)
+    days_diff = (first_event_datetime.date() - now.date()).days
+    if days_diff == 0:
+        return (isTodayTimeToRemind(first_event_datetime, now), events)
+    elif days_diff == 1:
+        return (isTomorrowTimeToRemind(first_event_datetime, now), events)
+    else:
+        return (False, events)
 
 def whenHourToRemind(events, date) -> datetime:
     notification_time = None
