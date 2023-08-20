@@ -3,5 +3,6 @@ from . import (
     time_checks,
     message_format,
     db,
-    config
+    config,
+    redis_config
 )
