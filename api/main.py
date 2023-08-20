@@ -100,8 +100,7 @@ def check_events():
 @app.route("/check_redis")
 def check_redis():
     r = redis.Redis.from_url(
-        os.getenv('KV_URL'),
-        ssl=True,
+        os.getenv('KV_URL').replace("redis://", "rediss://"),
         charset="utf-8",
         decode_responses=True)
 
