@@ -1,9 +1,12 @@
 import os, redis
 
 class Config(object):
-    _config = {}
+    default_values=dict(
+        last_time = '0001-01-01T00:00:00+00:00',
+    )
 
     def __init__(self, prefix):
+        self._config = {}
         self._prefix = prefix
 
         self._redis = redis.Redis.from_url(
@@ -17,11 +20,13 @@ class Config(object):
 
     def __getattr__(self, key):
         value = self._redis.get(self._format_key(key))
+        if value is None and default_values[key] is defined:
+            value = default_values[key]
 
         self._config[key] = value
         setattr(self, key, property(lambda self: self._getter(key), lambda self, value: self._setter(key, value)))
 
-        return self[key]
+        return value
 
     def _getter(self, key):
         return self._config[key]
