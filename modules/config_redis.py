@@ -1,4 +1,4 @@
-import redis
+import os, redis
 
 class Config(object):
     _config = {}
