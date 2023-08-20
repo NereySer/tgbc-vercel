@@ -4,5 +4,5 @@ from . import (
     message_format,
     db,
     config,
-    redis_config
+    config_redis
 )
