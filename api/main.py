@@ -108,7 +108,7 @@ def check_redis():
         r.set('test',1)
 
     last = r.get('test')
-    r.set('test',int(last)+1)
+    r.set('test',int(last)+1, ex=15)
     current = r.get('test')
 
     return f"""{last}
