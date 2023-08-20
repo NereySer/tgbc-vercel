@@ -128,10 +128,11 @@ def redis_config():
     config = config_redis.Config("test")
 
     last = config.last_time
-    config.last_time = '0002-01-01T00:00:00+00:00'
+    setter=config._setter('last_time', '0002-01-01T00:00:00+00:00')
     current = config.last_time
 
     return f"""{last}
+             {setter}
              {current}
               redis test done"""
     
