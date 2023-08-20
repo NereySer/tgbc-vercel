@@ -116,7 +116,7 @@ def check_redis():
               redis test done"""
     
 @app.route("/redis_creds")
-def check_redis():
+def redis_creds():
     return f"""{os.getenv('KV_URL')}
              {os.getenv('KV_REST_API_URL')}
              {os.getenv('KV_REST_API_TOKEN')}
