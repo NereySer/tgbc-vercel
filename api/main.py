@@ -2,6 +2,7 @@ import os
 import signal
 import telebot
 from flask import Flask, request, send_from_directory, abort
+import redis
 
 from datetime import datetime, timedelta
 
