@@ -13,7 +13,7 @@ class Config(object):
         return cls._instances[prefix]
 
     def __init__(self, prefix):
-        if not self.get('_init_done', False):
+        if not hasattr(self,'_init_done'):
             self._init_done = True
             self._config = {}
             self._prefix = prefix
