@@ -20,7 +20,7 @@ class Config(object):
 
     def __getattr__(self, key):
         value = self._redis.get(self._format_key(key))
-        if value is None and key in self._DEFAULT_VALUES is defined:
+        if value is None and key in self._DEFAULT_VALUES:
             value = self._DEFAULT_VALUES[key]
 
         self._config[key] = value
