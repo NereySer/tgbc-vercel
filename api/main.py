@@ -134,7 +134,6 @@ def redis_config():
     current = config.last_time
 
     return f"""{last}
-             {setter}
              {current}
               redis test done"""
     
