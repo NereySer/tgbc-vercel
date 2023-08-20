@@ -110,13 +110,17 @@ def check_redis():
     last = r.get('test')
     r.set('test',last+1)
     current = r.get('test')
+
+    return f"""{last}
+             {current}
+              redis test done"""
     
+@app.route("/redis_creds")
+def check_redis():
     return f"""{os.getenv('KV_URL')}
              {os.getenv('KV_REST_API_URL')}
              {os.getenv('KV_REST_API_TOKEN')}
              {os.getenv('KV_REST_API_READ_ONLY_TOKEN')}
-             {last}
-             {current}
               redis test done"""
 
 if __name__ == "__main__":
