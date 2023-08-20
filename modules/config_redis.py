@@ -15,7 +15,6 @@ class Config(object):
     def __init__(self, prefix):
         if not hasattr(self,'_init_done'):
             self._init_done = True
-            self._config = {}
             self._prefix = prefix
 
         self._redis = redis.Redis.from_url(
@@ -34,17 +33,10 @@ class Config(object):
         if value is None and key in _DEFAULT_VALUES:
             value = _DEFAULT_VALUES[key]
 
-        self._config[key] = value
-        setattr(type(self), key, property(lambda self: self._getter(key), lambda self, value: self._setter(key, value)))
-
         return value
 
-    def _getter(self, key):
-        return self._config[key]
-
-    def _setter(self, key, value):
-        self._config[key] = value
-
-        self._redis.set(self._format_key(key), value)
-
-        return f"{self._format_key(key)} {value} {self._redis.get(self._format_key(key))}"
+    def __setattr__(self, key, value):
+        if key[0] == '_':
+            setattr(self, key, value)
+        else:
+            self._redis.set(self._format_key(key), value)
