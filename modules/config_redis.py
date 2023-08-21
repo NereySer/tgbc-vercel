@@ -9,19 +9,18 @@ class Config(object):
 
     def __new__(cls, prefix, *args, **kwargs):
         if not prefix in cls._instances:
-            cls._instances[prefix] = super().__new__(cls)
-        return cls._instances[prefix]
+            self = super().__new__(cls)
 
-    def __init__(self, prefix):
-        if not hasattr(self,'_init_done'):
-            self._init_done = True
             self._prefix = prefix
+            self._redis = redis.Redis.from_url(
+              os.getenv('KV_URL').replace("redis://", "rediss://"),
+              charset="utf-8",
+              decode_responses=True,
+            )
 
-        self._redis = redis.Redis.from_url(
-          os.getenv('KV_URL').replace("redis://", "rediss://"),
-          charset="utf-8",
-          decode_responses=True,
-        )
+            cls._instances[prefix] = self
+
+        return cls._instances[prefix]
 
     def _format_key(self, key):
         return f"{self._prefix}_{key}"
