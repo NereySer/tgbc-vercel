@@ -1,6 +1,6 @@
 import os
 
-import googleapiclient
+import googleapiclient, json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -11,7 +11,7 @@ g_service = None
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 calendarId = os.getenv('GOOGLE_CALENDAR_ID')
-SERVICE_ACCOUNT_FILE = 'key/civil-hash.json'
+account_key = json.loads(os.getenv('GOOGLE_KEY'))
 
 class Events:
     def __init__(self, events = [], date = datetime.now()):
@@ -34,7 +34,7 @@ def getGService():
     global g_service
     
     if g_service is None:
-        credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        credentials = service_account.Credentials.from_service_account_file(account_key, scopes=SCOPES)
         g_service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
 
 def format_datetime(val: datetime) -> str:
