@@ -34,7 +34,7 @@ def getGService():
     global g_service
     
     if g_service is None:
-        credentials = service_account.Credentials.from_service_account_file(account_key, scopes=SCOPES)
+        credentials = service_account.Credentials.from_service_account_info(account_key, scopes=SCOPES)
         g_service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
 
 def format_datetime(val: datetime) -> str:
