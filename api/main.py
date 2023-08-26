@@ -129,7 +129,7 @@ def redis_creds():
 
 @app.route("/redis_config")
 def redis_config():
-    config = config_redis.Config("test")
+    config = config_redis.Config("dev")
 
     last = config.last_time
     config.last_time = '0002-01-01T00:00:00+00:00'
