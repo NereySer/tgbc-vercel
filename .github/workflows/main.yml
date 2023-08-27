@@ -7,6 +7,14 @@ on:
     branches: [ main, develop ]
 
 jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo
+        run: echo ${{ github.ref }}
+      - name: export
+        run: export
+
   Deploy-Production:
     if: github.ref == 'refs/heads/main'
     env:
