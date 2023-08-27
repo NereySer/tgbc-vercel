@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: echo
         run: echo ${{ github.ref }}
+      - name: echo
+        run: echo ${{ github.ref == 'refs/heads/main' && 'main branch' || 'non-main branch' }}
       - name: export
         run: export
 
